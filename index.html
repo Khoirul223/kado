@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Hasya</title>
+    <style>
+        body {
+            background-color: #ffeef2;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 80%;
+        }
+
+        h1 { color: #ff4d6d; font-size: 2.5em; }
+        p { color: #555; font-size: 1.2em; line-height: 1.6; }
+        .heart { color: #ff4d6d; font-size: 50px; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        #btn-mulai {
+            background-color: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #btn-mulai:hover { background-color: #c9184a; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <button id="btn-mulai" onclick="mulai()">Klik Ini Dulu, Hasya</button>
+    </div>
+
+    <div id="content" class="hidden">
+        <div class="container">
+            <div class="heart">❤️</div>
+            <h1>Happy Valentine, Hasya!</h1>
+            <p>I just need you to know...</p>
+            <p><i>"I love you so, please let me go~"</i></p>
+            <p>Tapi bohong, jangan pergi ya! <br> You're the best thing ever.</p>
+        </div>
+    </div>
+
+    <audio id="lagu" loop>
+        <source src="https://www.mboxdrive.com/The%20Walters%20-%20I%20Love%20You%20So.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        function mulai() {
+            document.getElementById('overlay').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+            var audio = document.getElementById('lagu');
+            audio.play();
+            
+            // Efek Confetti Sederhana
+            setInterval(createHeart, 300);
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.style.position = 'fixed';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '-20px';
+            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+            heart.style.opacity = Math.random();
+            heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+            heart.style.transition = 'top 3s linear';
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.style.top = '100vh';
+            }, 100);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
