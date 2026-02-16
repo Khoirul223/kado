@@ -5,13 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For Hasya</title>
     <style>
-        body { background-color: #ffeef2; font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; text-align: center; }
-        .container { z-index: 10; background: rgba(255, 255, 255, 0.8); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 80%; }
-        h1 { color: #ff4d6d; font-size: 2.5em; }
-        p { color: #555; font-size: 1.2em; line-height: 1.6; }
-        .heart { color: #ff4d6d; font-size: 50px; animation: pulse 1s infinite; }
+        body { 
+            background-color: #ffeef2; 
+            font-family: 'Arial', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden; 
+            text-align: center; 
+        }
+        .container { 
+            z-index: 10; 
+            background: rgba(255, 255, 255, 0.9); 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            max-width: 80%; 
+        }
+        h1 { color: #ff4d6d; font-size: 2.2em; margin-bottom: 10px; }
+        p { color: #555; font-size: 1.1em; line-height: 1.5; }
+        .heart-icon { color: #ff4d6d; font-size: 50px; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        #btn-mulai { background-color: #ff4d6d; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 1em; cursor: pointer; transition: 0.3s; }
+        #btn-mulai { 
+            background-color: #ff4d6d; 
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            border-radius: 50px; 
+            font-size: 1.1em; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+        }
         .hidden { display: none; }
     </style>
 </head>
@@ -23,26 +49,31 @@
 
     <div id="content" class="hidden">
         <div class="container">
-            <div class="heart">❤️</div>
+            <div class="heart-icon">❤️</div>
             <h1>Happy Valentine, Hasya!</h1>
             <p>I just need you to know...</p>
             <p><i>"I love you so, please let me go~"</i></p>
-            <p>Tapi bohong, jangan pergi ya! <br> You're the best thing ever.</p>
+            <p>Tapi bohong, jangan pergi ya!<br>Stay with me.</p>
         </div>
     </div>
 
-    <audio id="lagu" loop>
-        <source src="https://files.catbox.moe/972w8m.mp3" type="audio/mpeg">
+    <audio id="lagu" preload="auto" loop>
+        <source src="lagu.mp3" type="audio/mpeg">
     </audio>
 
     <script>
         function mulai() {
+            // Sembunyikan tombol dan munculkan konten
             document.getElementById('overlay').classList.add('hidden');
             document.getElementById('content').classList.remove('hidden');
+            
+            // Putar musik
             var audio = document.getElementById('lagu');
             audio.play().catch(function(error) {
-                console.log("Autoplay dicegah oleh browser, tapi sudah diatasi dengan tombol klik.");
+                console.log("Gagal putar otomatis, tapi tombol sudah ditekan.");
             });
+
+            // Mulai efek hati jatuh
             setInterval(createHeart, 300);
         }
 
@@ -55,9 +86,16 @@
             heart.style.fontSize = Math.random() * 20 + 10 + 'px';
             heart.style.opacity = Math.random();
             heart.style.transition = 'top 3s linear';
+            heart.style.zIndex = '1';
             document.body.appendChild(heart);
-            setTimeout(() => { heart.style.top = '100vh'; }, 100);
-            setTimeout(() => { heart.remove(); }, 3000);
+
+            setTimeout(() => {
+                heart.style.top = '100vh';
+            }, 100);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 3000);
         }
     </script>
 </body>
