@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semangat Cepat Sembuh! ❤️</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f8ff 0%, #ffe9f3 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Canvas untuk animasi bunga berguguran */
+        #flowerCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Container Bingkai Bunga */
+        .flower-frame {
+            position: relative;
+            padding: 15px; /* Jarak untuk bunga di pinggiran */
+            z-index: 10;
+        }
+
+        /* Hiasan Bunga Mekar di Pojok & Sisi */
+        .flower-frame::before, .flower-frame::after {
+            content: '🌸';
+            position: absolute;
+            font-size: 30px;
+            z-index: 11;
+        }
+        .flower-frame::before { top: -10px; left: -10px; }
+        .flower-frame::after { bottom: -10px; right: -10px; }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 380px;
+            width: 85%;
+            border: 4px double #ffb6c1; /* Bingkai dalam */
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Tambahan bunga di sisi lain */
+        .extra-flower-1 { position: absolute; top: -10px; right: -10px; font-size: 30px; }
+        .extra-flower-2 { position: absolute; bottom: -10px; left: -10px; font-size: 30px; }
+
+        h1 { color: #ff6b6b; margin-top: 10px; }
+        p { color: #555; line-height: 1.6; }
+
+        input {
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #ffb6c1;
+            width: 85%;
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover { transform: scale(1.05); }
+
+        #halaman-ucapan { display: none; animation: fadeIn 1.5s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        audio { width: 100%; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <canvas id="flowerCanvas"></canvas>
+
+    <div class="flower-frame">
+        <span class="extra-flower-1">🌸</span>
+        <span class="extra-flower-2">🌸</span>
+        
+        <div class="card" id="halaman-game">
+            <div style="font-size: 50px;">🤔</div>
+            <h1>Tebak Dulu!</h1>
+            <p>Gimana caranya orang bungkuk tidur?</p>
+            <input type="text" id="jawaban" placeholder="Ketik jawabannya...">
+            <br>
+            <button onclick="cekJawaban()">Jawab!</button>
+            <p id="hint" style="color: #ff4d4d; font-weight: bold; margin-top: 10px;"></p>
+        </div>
+
+        <div class="card" id="halaman-ucapan">
+            <div style="font-size: 50px;">💐</div>
+            <h1>Get Well Soon!</h1>
+            <p><i>"Yeay bener! Jawabannya <b>merem</b> lah ya!"</i></p>
+            <p>Kamu itu kuat dan berharga. Semangat terus ya, istirahat yang cukup biar cepet pulih!</p>
+            <p>❤️ <b>Luv You!</b> ❤️</p>
+            
+            <audio id="lagu" controls>
+                <source src="lagu-kamu.mp3" type="audio/mpeg">
+            </audio>
+        </div>
+    </div>
+
+<script>
+    function cekJawaban() {
+        const jawab = document.getElementById('jawaban').value.toLowerCase();
+        const cardGame = document.getElementById('halaman-game');
+        
+        if (jawab.includes("merem")) {
+            cardGame.parentElement.style.display = "none"; // Sembunyikan frame lama
+            document.getElementById('halaman-game').style.display = "none";
+            document.getElementById('halaman-ucapan').style.display = "block";
+            // Tampilkan kembali frame untuk halaman ucapan
+            document.getElementById('halaman-ucapan').parentElement.style.display = "block";
+            document.getElementById('lagu').play();
+        } else {
+            document.getElementById('halaman-game').classList.add('shake');
+            document.getElementById('hint').innerHTML = "Salahhh! Ayo coba lagi...";
+            setTimeout(() => document.getElementById('halaman-game').classList.remove('shake'), 500);
+        }
+    }
+
+    // --- ANIMASI BUNGA BERGUGURAN ---
+    const canvas = document.getElementById('flowerCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let petals = [];
+    class Petal {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height - canvas.height;
+            this.size = Math.random() * 7 + 3;
+            this.speed = Math.random() * 1 + 0.5;
+            this.angle = Math.random() * 360;
+            this.spin = Math.random() * 2 - 1;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.fillStyle = "#ffc0cb";
+            ctx.ellipse(this.x, this.y, this.size, this.size/1.5, this.angle * Math.PI/180, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        update() {
+            this.y += this.speed;
+            this.x += Math.sin(this.y / 50);
+            this.angle += this.spin;
+            if (this.y > canvas.height) {
+                this.y = -20;
+                this.x = Math.random() * canvas.width;
+            }
+        }
+    }
+    for (let i = 0; i < 40; i++) { petals.push(new Petal()); }
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        petals.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
+
+</body>
+</html>
