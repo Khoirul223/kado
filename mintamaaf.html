@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tebak-tebakan Lucu</title>
+    <title>Untuk Kamu ❤️</title>
     <style>
         body {
             margin: 0;
@@ -18,48 +18,59 @@
             text-align: center;
         }
 
-        /* Bingkai Bunga di Pinggir */
+        /* Bingkai Bunga di Pinggir (Muncul di Slide Akhir) */
         .flower-frame {
             position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            border: 15px solid transparent;
-            border-image: url('https://www.transparentpng.com/download/floral/pink-flower-frame-png-free-download-2.png') 30 round;
+            border: 20px solid transparent;
+            /* Menggunakan gambar dekoratif bunga */
+            border-image: url('https://www.transparentpng.com/download/floral/pink-flower-frame-png-free-download-2.png') 100 round;
             z-index: 100;
-            display: none; /* Muncul di akhir */
+            display: none;
+            box-sizing: border-box;
         }
 
         #container {
-            background: white;
-            padding: 30px;
-            border-radius: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 350px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 30px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(214, 51, 132, 0.2);
+            max-width: 380px;
             z-index: 10;
+            position: relative;
         }
 
-        h2 { color: #d63384; font-size: 1.2rem; }
+        h2 { color: #d63384; font-size: 1.3rem; margin-bottom: 20px; }
         
         .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             margin-top: 20px;
         }
 
         button {
             background: #ff85a2;
             border: none;
-            padding: 12px;
+            padding: 14px;
             color: white;
-            border-radius: 15px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 133, 162, 0.3);
         }
 
-        button:hover { background: #e0607e; transform: scale(1.05); }
+        button:hover { 
+            background: #e0607e; 
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(224, 96, 126, 0.4);
+        }
 
         /* Animasi Bunga Gugur */
         .petal {
@@ -75,7 +86,12 @@
         }
 
         .hidden { display: none; }
-        .pesan { font-style: italic; line-height: 1.6; color: #555; }
+        .pesan { 
+            font-style: italic; 
+            line-height: 1.8; 
+            color: #555; 
+            font-size: 1.05rem;
+        }
     </style>
 </head>
 <body>
@@ -87,44 +103,49 @@
         <div id="slide1">
             <h2 id="judul-tebak">Apa yang kecil, lucu, imut, cantik, mirip sama botol Yakult?</h2>
             <div class="btn-group">
-                <button onclick="salah()">Anak Kucing</button>
-                <button onclick="salah()">Anak Kambing</button>
-                <button onclick="salah()">Anak Ayam</button>
+                <button onclick="salah()">Anak Kucing 🐱</button>
+                <button onclick="salah()">Anak Kambing 🐐</button>
+                <button onclick="salah()">Anak Ayam 🐥</button>
             </div>
-            <p id="notif" style="color: red; font-size: 0.8rem; margin-top: 10px;"></p>
+            <p id="notif" style="color: #ff4d4d; font-size: 0.9rem; margin-top: 15px; font-weight: 500;"></p>
         </div>
 
         <div id="slide2" class="hidden">
-            <h2>Dih salah semua! 😋</h2>
-            <p>Mau tau jawabannya?</p>
-            <button onclick="showJawaban()">Klik di sini</button>
+            <h2 style="color: #ff4d4d;">Dih, salah semua! 😋</h2>
+            <p>Masa gitu aja gak tau? <br>Mau tau jawabannya siapa?</p>
+            <div class="btn-group">
+                <button onclick="showJawaban()">Klik di sini ✨</button>
+            </div>
         </div>
 
         <div id="slide3" class="hidden">
-            <h1 style="color: #d63384;">Jawabannya: KAMUUU! ❤️</h1>
-            <p>Hehe, klik lanjut ya...</p>
-            <button onclick="showFinal()">Lanjut</button>
+            <h1 style="color: #d63384; font-size: 2.5rem; margin: 0;">KAMUUU! ❤️</h1>
+            <p style="margin-top: 10px;">Iya kamu, si kecil imut bin ajaib...</p>
+            <div class="btn-group">
+                <button onclick="showFinal()">Lanjut...</button>
+            </div>
         </div>
 
         <div id="slide4" class="hidden">
-            <h2>Maafin aku ya...</h2>
+            <h2 style="font-size: 1.5rem;">Maafin aku ya...</h2>
             <div class="pesan">
                 <p>Maaf kalau belakangan ini aku ngebosenin dan gak kayak dulu lagi...</p>
-                <p>Maaf juga kalau aku pernah bikin kamu cemburu atau buat kesalahan lainnya. Aku sayang banget sama kamu. ✨</p>
+                <p>Maaf juga kalau aku pernah bikin kamu cemburu atau buat kesalahan lainnya.</p>
+                <p><strong>Aku akan selalu ada buat kamu dan makasih udah jadi orang yang selalu ada buat aku. ✨</strong></p>
             </div>
         </div>
     </div>
 
     <script>
-        let salahCount = 0;
+        let klikSalah = 0;
 
         function salah() {
-            salahCount++;
+            klikSalah++;
             const notif = document.getElementById('notif');
-            if(salahCount == 1) notif.innerText = "Tetott! Salah, coba lagi.";
-            if(salahCount == 2) notif.innerText = "Ih kok salah terus sih? Sekali lagi!";
             
-            if(salahCount >= 3) {
+            if(klikSalah === 1) notif.innerText = "Salahh! Bukan itu 😜";
+            else if(klikSalah === 2) notif.innerText = "Masih salah, coba fokus dong! 😤";
+            else if(klikSalah >= 3) {
                 document.getElementById('slide1').classList.add('hidden');
                 document.getElementById('slide2').classList.remove('hidden');
             }
@@ -141,20 +162,22 @@
             document.getElementById('frame').style.display = 'block';
             
             // Putar Lagu
-            document.getElementById('lagu').play();
+            const audio = document.getElementById('lagu');
+            audio.play().catch(e => console.log("Musik butuh interaksi user untuk mulai."));
 
             // Mulai Bunga Berguguran
-            setInterval(createPetal, 300);
+            setInterval(createPetal, 400);
         }
 
         function createPetal() {
             const petal = document.createElement('div');
-            const flowers = ['🌸', '🌷', '🌹', '✨'];
+            const symbols = ['🌸', '🌷', '✨', '💖', '💕'];
             petal.classList.add('petal');
-            petal.innerText = flowers[Math.floor(Math.random() * flowers.length)];
+            petal.innerText = symbols[Math.floor(Math.random() * symbols.length)];
             petal.style.left = Math.random() * 100 + 'vw';
-            petal.style.fontSize = (Math.random() * 10 + 15) + 'px';
+            petal.style.fontSize = (Math.random() * 15 + 15) + 'px';
             petal.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            petal.style.opacity = Math.random();
             document.body.appendChild(petal);
 
             setTimeout(() => { petal.remove(); }, 5000);
