@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tebak-tebakan Lucu</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #fff0f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Bingkai Bunga di Pinggir */
+        .flower-frame {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border: 15px solid transparent;
+            border-image: url('https://www.transparentpng.com/download/floral/pink-flower-frame-png-free-download-2.png') 30 round;
+            z-index: 100;
+            display: none; /* Muncul di akhir */
+        }
+
+        #container {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 350px;
+            z-index: 10;
+        }
+
+        h2 { color: #d63384; font-size: 1.2rem; }
+        
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #ff85a2;
+            border: none;
+            padding: 12px;
+            color: white;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #e0607e; transform: scale(1.05); }
+
+        /* Animasi Bunga Gugur */
+        .petal {
+            position: absolute;
+            top: -10%;
+            user-select: none;
+            z-index: 1;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        .hidden { display: none; }
+        .pesan { font-style: italic; line-height: 1.6; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="flower-frame" id="frame"></div>
+    <audio id="lagu" src="lagu-kamu.mp3" loop></audio>
+
+    <div id="container">
+        <div id="slide1">
+            <h2 id="judul-tebak">Apa yang kecil, lucu, imut, cantik, mirip sama botol Yakult?</h2>
+            <div class="btn-group">
+                <button onclick="salah()">Anak Kucing</button>
+                <button onclick="salah()">Anak Kambing</button>
+                <button onclick="salah()">Anak Ayam</button>
+            </div>
+            <p id="notif" style="color: red; font-size: 0.8rem; margin-top: 10px;"></p>
+        </div>
+
+        <div id="slide2" class="hidden">
+            <h2>Dih salah semua! 😋</h2>
+            <p>Mau tau jawabannya?</p>
+            <button onclick="showJawaban()">Klik di sini</button>
+        </div>
+
+        <div id="slide3" class="hidden">
+            <h1 style="color: #d63384;">Jawabannya: KAMUUU! ❤️</h1>
+            <p>Hehe, klik lanjut ya...</p>
+            <button onclick="showFinal()">Lanjut</button>
+        </div>
+
+        <div id="slide4" class="hidden">
+            <h2>Maafin aku ya...</h2>
+            <div class="pesan">
+                <p>Maaf kalau belakangan ini aku ngebosenin dan gak kayak dulu lagi...</p>
+                <p>Maaf juga kalau aku pernah bikin kamu cemburu atau buat kesalahan lainnya. Aku sayang banget sama kamu. ✨</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let salahCount = 0;
+
+        function salah() {
+            salahCount++;
+            const notif = document.getElementById('notif');
+            if(salahCount == 1) notif.innerText = "Tetott! Salah, coba lagi.";
+            if(salahCount == 2) notif.innerText = "Ih kok salah terus sih? Sekali lagi!";
+            
+            if(salahCount >= 3) {
+                document.getElementById('slide1').classList.add('hidden');
+                document.getElementById('slide2').classList.remove('hidden');
+            }
+        }
+
+        function showJawaban() {
+            document.getElementById('slide2').classList.add('hidden');
+            document.getElementById('slide3').classList.remove('hidden');
+        }
+
+        function showFinal() {
+            document.getElementById('slide3').classList.add('hidden');
+            document.getElementById('slide4').classList.remove('hidden');
+            document.getElementById('frame').style.display = 'block';
+            
+            // Putar Lagu
+            document.getElementById('lagu').play();
+
+            // Mulai Bunga Berguguran
+            setInterval(createPetal, 300);
+        }
+
+        function createPetal() {
+            const petal = document.createElement('div');
+            const flowers = ['🌸', '🌷', '🌹', '✨'];
+            petal.classList.add('petal');
+            petal.innerText = flowers[Math.floor(Math.random() * flowers.length)];
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.fontSize = (Math.random() * 10 + 15) + 'px';
+            petal.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.body.appendChild(petal);
+
+            setTimeout(() => { petal.remove(); }, 5000);
+        }
+    </script>
+</body>
+</html>
