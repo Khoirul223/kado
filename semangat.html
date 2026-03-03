@@ -1,163 +1,104 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>semangat cepat sembuh!❤️</title>
+<head>
+    <title>Semangat Cepat Sembuh! ❤️</title>
     <style>
-      body { font-family: 'Segoe UI', Tahoma,
-        Ganeva, Verdana, sans-serif; 
-            background:linear-gradient(135deg,
-        #f0f8ff 0%, #e6fffa 100%);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-                overflow: hidden;
-           }
-          .card {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6fffa 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .card {
             background: white;
             padding: 30px;
-            box-shadow: 0 15px 35px
-      rgba(0,0,0,0,.1;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
             max-width: 400px;
-            border: 2px solid #fff;
-          }
-          h1 { color: #ff6b6b; margin-bottom:
-      10px:}
-          p { color: #555; line-height: 1.6;
-     font-size: 15px }
+            width: 90%;
+        }
+        h1 { color: #ff6b6b; }
+        input {
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #4facfe;
+            width: 80%;
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #4facfe;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        /* Animasi Salah */
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+        #halaman-ucapan { display: none; }
+    </style>
+</head>
+<body>
 
-      .game-section {
-        background: #f9f9f9;
-        padding: 15px;
-        border-radius: 15px;
-        margin: 20px 0;
-      }
-
-      input {
-        padding: 12px;
-        border-radius: 12px;
-        border: 2px solid #4facfe
-        width: 60px;
-        text-align: center;
-        font-size: 18px;
-        outline: none;
-      }
-
-      button {
-        background: linear-gradient(to right,
-  #4facfe, #00f2fe);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 12px;
-        cursor: pointer;
-        font-weight: bold;
-        margin-left: 10px;
-        transition: 0.3s;
-      }
-      button:hover { transform: scale(1.05);}
-
-      #message {
-        margin-top: 20px;
-        display: none;
-        animation: fadeln 1s ease-in
-      }
-
-      .music-player {
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 1px dashed #ddd;
-      }
-
-      @keyframes fadeln {
-        from {opacity: 0; transform:
-  translateY(10PX); }
-        to { opacity: 1; transform:
-  translateY(0); }
-      }
-
-      .emoji { font-size: 40px; margin-bottom:
-        10pc; }
-          </style>
-  </head>
-  </body> 
-
-  <div class="card">
-    <div class="emoli">💊</div>
-    <h1 >get well soon!</h1>
-    <p>main game kecil dulu yukk biar nggak
-      bosen pas istirahat.</p>
-
-    <div class="game-section">
-      <p>tebak angka keberuntungan <b>1 -
-   10</b></p>
-       <input type="number" id="guess"
-    min="1" max="10" placeholder="?">
-        <button onclick="checkGuess()">tebakk!
-    </button>
-        <p id="hint" style="font-size: 13px;
-    color: #888; margin-top: 10px;"></p>
+    <div class="card" id="halaman-game">
+        <div style="font-size: 40px;">🤔</div>
+        <h1>Tebak-tebakan Dulu!</h1>
+        <p>Gimana caranya orang bungkuk tidur?</p>
+        <input type="text" id="jawaban" placeholder="Ketik jawabannya di sini...">
+        <br>
+        <button onclick="cekJawaban()">Jawab!</button>
+        <p id="hint" style="color: red; font-size: 13px;"></p>
     </div>
 
-    <div id="message">
-      <h3 style="color: #2ecc71:">yeayy, benerr
-   bangettt!🎉</h3>
-      <p><i>"kamu itu kuat, hebat, dan berharga. penyakit ini cuma mampir bentar
-        kok, besok lusa kamu pasti udah lari-lari lagii.
-        semangatt terus ya harinya, istirahat yang cukup!"</i></p>
-        <p>❤️<b>luv</b> ❤️</p>
-       </div>
-
-    <div class="music-player">
-      <p style="font-size: 11px; color: #999;
-  margin-bottom: 5px:">🎵 musik pengantar
-  tidur & santai:</p>
-      <audio id="myAudio" controls
-  style="height: 30px; widht: 220px;">
-        <source
-  src="https://www.soundhelix.com
-  /examples/mp3/SoundHelix-Song-1.mp3"           
-  type="audio/mpeg">
-      </audio>
+    <div class="card" id="halaman-ucapan">
+        <div style="font-size: 40px;">🌸</div>
+        <h1>Get Well Soon!</h1>
+        <p><i>"Yeay bener! Jawabannya merem lah ya, masa bungkuk juga tidurnya hehe. Kamu itu kuat, hebat, dan berharga. Semangat terus ya harinya, istirahat yang cukup!"</i></p>
+        <p>❤️ <b>Luv!</b> ❤️</p>
+        
+        <hr>
+        <p style="font-size: 11px;">🎵 Sekarang dengerin lagu ini ya...</p>
+        <audio id="lagu" controls>
+            <source src="lagu-kamu.mp3" type="audio/mpeg">
+        </audio>
     </div>
-  </div>
 
-  <script>
-    // Angka random buat di tebak
-    const target = Math.floor(Math.random()
-  *10) + 1;
-    const audio =
-  document.getElementByld("myAuido");
-    function checkGuess() {
-      const userGuess =
-  document.getElementByld('guess').value;
-      const hint =
-  document.getElementByld('hint');
-      const messageDiv =
-  document.getElementByld('message');
+<script>
+    function cekJawaban() {
+        const jawaban = document.getElementById('jawaban').value.toLowerCase();
+        const gameCard = document.getElementById('halaman-game');
+        const hint = document.getElementById('hint');
 
-    // mainkan musik saat dia mulai
-interaksi (solusi blokir autoplay browser)
-      audio.play();
-
-    if (userGuess == target) {
-      hint.innerHTML = "";
-      messageDiv.style.display = "block";
-
-document.querySelector('.game-selection').st
-yle.display = "none";
-    } else if (userGuess < target &&
-angka lebih kecil.";
-    } else if (userGuess < target &&
-userGuess != "") {
-      hint.innerHTML = " Kekecilan! Coba
-angka lebih gede.";
+        // Jawaban yang benar adalah 'merem'
+        if (jawaban.includes("merem")) {
+            document.getElementById('halaman-game').style.display = "none";
+            document.getElementById('halaman-ucapan').style.display = "block";
+            document.getElementById('lagu').play(); // Lagu otomatis jalan
+        } else {
+            // Efek animasi salah (getar)
+            gameCard.classList.add('shake');
+            hint.innerHTML = "Salahhh! Ayo coba lagi...";
+            setTimeout(() => { gameCard.classList.remove('shake'); }, 500);
+        }
     }
-    }
-  </script>
+</script>
 
 </body>
 </html>
-       
