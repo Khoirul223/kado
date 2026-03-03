@@ -1,0 +1,163 @@
+<!DOCTYPE html> 
+<html>
+  <head>
+    <title>semangat cepat sembuh!❤️</title>
+    <style>
+      body { font-family: 'Segoe UI', Tahoma,
+        Ganeva, Verdana, sans-serif; 
+            background:linear-gradient(135deg,
+        #f0f8ff 0%, #e6fffa 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                overflow: hidden;
+           }
+          .card {
+            background: white;
+            padding: 30px;
+            box-shadow: 0 15px 35px
+      rgba(0,0,0,0,.1;
+            text-align: center;
+            max-width: 400px;
+            border: 2px solid #fff;
+          }
+          h1 { color: #ff6b6b; margin-bottom:
+      10px:}
+          p { color: #555; line-height: 1.6;
+     font-size: 15px }
+
+      .game-section {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 15px;
+        margin: 20px 0;
+      }
+
+      input {
+        padding: 12px;
+        border-radius: 12px;
+        border: 2px solid #4facfe
+        width: 60px;
+        text-align: center;
+        font-size: 18px;
+        outline: none;
+      }
+
+      button {
+        background: linear-gradient(to right,
+  #4facfe, #00f2fe);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-left: 10px;
+        transition: 0.3s;
+      }
+      button:hover { transform: scale(1.05);}
+
+      #message {
+        margin-top: 20px;
+        display: none;
+        animation: fadeln 1s ease-in
+      }
+
+      .music-player {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px dashed #ddd;
+      }
+
+      @keyframes fadeln {
+        from {opacity: 0; transform:
+  translateY(10PX); }
+        to { opacity: 1; transform:
+  translateY(0); }
+      }
+
+      .emoji { font-size: 40px; margin-bottom:
+        10pc; }
+          </style>
+  </head>
+  </body> 
+
+  <div class="card">
+    <div class="emoli">💊</div>
+    <h1 >get well soon!</h1>
+    <p>main game kecil dulu yukk biar nggak
+      bosen pas istirahat.</p>
+
+    <div class="game-section">
+      <p>tebak angka keberuntungan <b>1 -
+   10</b></p>
+       <input type="number" id="guess"
+    min="1" max="10" placeholder="?">
+        <button onclick="checkGuess()">tebakk!
+    </button>
+        <p id="hint" style="font-size: 13px;
+    color: #888; margin-top: 10px;"></p>
+    </div>
+
+    <div id="message">
+      <h3 style="color: #2ecc71:">yeayy, benerr
+   bangettt!🎉</h3>
+      <p><i>"kamu itu kuat, hebat, dan berharga. penyakit ini cuma mampir bentar
+        kok, besok lusa kamu pasti udah lari-lari lagii.
+        semangatt terus ya harinya, istirahat yang cukup!"</i></p>
+        <p>❤️<b>luv</b> ❤️</p>
+       </div>
+
+    <div class="music-player">
+      <p style="font-size: 11px; color: #999;
+  margin-bottom: 5px:">🎵 musik pengantar
+  tidur & santai:</p>
+      <audio id="myAudio" controls
+  style="height: 30px; widht: 220px;">
+        <source
+  src="https://www.soundhelix.com
+  /examples/mp3/SoundHelix-Song-1.mp3"           
+  type="audio/mpeg">
+      </audio>
+    </div>
+  </div>
+
+  <script>
+    // Angka random buat di tebak
+    const target = Math.floor(Math.random()
+  *10) + 1;
+    const audio =
+  document.getElementByld("myAuido");
+    function checkGuess() {
+      const userGuess =
+  document.getElementByld('guess').value;
+      const hint =
+  document.getElementByld('hint');
+      const messageDiv =
+  document.getElementByld('message');
+
+    // mainkan musik saat dia mulai
+interaksi (solusi blokir autoplay browser)
+      audio.play();
+
+    if (userGuess == target) {
+      hint.innerHTML = "";
+      messageDiv.style.display = "block";
+
+document.querySelector('.game-selection').st
+yle.display = "none";
+    } else if (userGuess < target &&
+angka lebih kecil.";
+    } else if (userGuess < target &&
+userGuess != "") {
+      hint.innerHTML = " Kekecilan! Coba
+angka lebih gede.";
+    }
+    }
+  </script>
+
+</body>
+</html>
+       
