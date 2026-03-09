@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pohon Cinta Kai - Camp Version</title>
+    <title>Pohon Cinta Kai - Anti Zoom Fix</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
     <style>
@@ -21,8 +21,8 @@
 
 <script>
     let groundY, song, waterLevel = 0;
-    let fallingLeaves = [], stars = [], shootingStars = [];
-    let isBlooming = false, growthStartTime = 0, played = false;
+    let stars = [], shootingStars = [];
+    let isBlooming = false, played = false;
     let bgColor = 255; 
 
     function preload() { 
@@ -30,9 +30,11 @@
     }
 
     function setup() {
+        // Menggunakan pixelDensity(1) agar resolusi tidak berubah saat zoom browser
+        pixelDensity(1);
         createCanvas(windowWidth, windowHeight);
         groundY = height - 113;
-        for(let i=0; i<120; i++) stars.push({x: random(width), y: random(height*0.7), s: random(1, 3)});
+        for(let i=0; i<150; i++) stars.push({x: random(width), y: random(height*0.8), s: random(1, 3)});
     }
 
     function draw() {
@@ -46,41 +48,23 @@
         
         drawDinoGround();
 
-        // ⛺️ --- Tambahan: Gambar Perkemahan di Kanan ---
         if (isBlooming) {
             drawCampground();
+            drawText();
         }
-        // ----------------------------------------------
 
         // Gambar Pohon
         push();
+        // Memastikan posisi pohon selalu di tengah bawah secara presisi
         translate(width/2, groundY);
         let treeSize = map(waterLevel, 0, 1, 0, height * 0.16);
         drawBranch(treeSize, map(waterLevel, 0, 1, 1, 12));
         pop();
-
-        // Gambar Daun yang Jatuh
-        if (isBlooming) {
-            for (let i = fallingLeaves.length - 1; i >= 0; i--) {
-                fallingLeaves[i].update();
-                fallingLeaves[i].display();
-                if (fallingLeaves[i].alpha <= 0) fallingLeaves.splice(i, 1);
-            }
-            drawText();
-        }
     }
 
     function drawDinoGround() {
         stroke(bgColor > 100 ? 50 : 180); strokeWeight(2);
         line(0, groundY, width, groundY);
-        randomSeed(99);
-        for (let i = 0; i < width; i += 60) {
-            if (random() > 0.6) {
-                let x = i + random(-20, 20);
-                line(x, groundY + 8, x + 10, groundY + 8);
-                point(x + 3, groundY + 12);
-            }
-        }
     }
 
     function drawBranch(len, thickness) {
@@ -88,7 +72,7 @@
         strokeWeight(max(0.5, thickness));
         
         let n = noise(len * 0.1, frameCount * 0.005);
-        let rotMod = map(n, 0, 1, -0.03, 0.03);
+        let rotMod = map(n, 0, 1, -0.02, 0.02);
         
         line(0, 0, 0, -len);
         translate(0, -len);
@@ -103,15 +87,9 @@
             drawBranch(len * 0.72, thickness * 0.7);
             pop();
         } else if (waterLevel >= 1 && bgColor < 200) {
-            if (!isBlooming) {
-                isBlooming = true;
-                growthStartTime = millis();
-            }
+            isBlooming = true;
+            // Bunga digambar langsung di dahan agar ikut bergerak & stabil
             drawFlowerOnBranch();
-            if (random(1) < 0.008) { 
-                let m = drawingContext.getTransform();
-                fallingLeaves.push(new Leaf(random(330, 360), m.e, m.f));
-            }
         }
     }
 
@@ -119,21 +97,20 @@
         push();
         colorMode(HSB, 360, 100, 100, 255);
         noStroke();
-        fill(random(330, 360), 65, 100, 180);
-        for(let i=0; i<5; i++) {
-            ellipse(0, 0, 7, 4);
-            rotate(TWO_PI/5);
+        fill(random(330, 360), 60, 100, 150);
+        // Kelopak bunga yang lebih rapat agar tidak melayang
+        for(let i=0; i<6; i++) {
+            ellipse(1, 0, 6, 4);
+            rotate(TWO_PI/6);
         }
         pop();
     }
 
     function drawNightSky() {
-        fill(255, map(bgColor, 255, 10, 0, 230)); noStroke();
+        fill(255, map(bgColor, 255, 10, 0, 200)); noStroke();
         for(let s of stars) ellipse(s.x, s.y, s.s);
         
-        // ✨ --- Perubahan: Bintang Jatuh Jauh Lebih Sering ---
-        if (random(1) < 0.15) shootingStars.push(new ShootingStar()); // Frekuensi 15% per frame
-        // ----------------------------------------------------
+        if (random(1) < 0.1) shootingStars.push(new ShootingStar());
         
         for (let i = shootingStars.length - 1; i >= 0; i--) {
             shootingStars[i].update(); shootingStars[i].display();
@@ -141,53 +118,29 @@
         }
     }
 
-    // --- Tambahan: Fungsi Menggambar Area Perkemahan ---
     function drawCampground() {
-        let baseX = width * 0.75;
+        // Menggunakan width * 0.5 + offset agar posisinya relatif terhadap pohon di tengah
+        let baseX = width * 0.5 + 150; 
         let baseY = groundY;
         
         push();
-        strokeWeight(2);
+        // Tenda
+        fill(40, 70, 40); stroke(20);
+        triangle(baseX, baseY, baseX + 80, baseY, baseX + 40, baseY - 60);
         
-        // 1. Tenda
-        fill(50, 80, 50); stroke(30);
-        triangle(baseX, baseY, baseX + 100, baseY, baseX + 50, baseY - 70);
-        fill(40, 60, 40); noStroke(); // Pintu Tenda
-        triangle(baseX + 25, baseY, baseX + 75, baseY, baseX + 50, baseY - 50);
-        
-        // 2. Kursi Kayu
-        fill(100, 60, 30); stroke(50, 30, 10);
-        rect(baseX - 60, baseY - 15, 40, 15, 3); // Kursi
-        line(baseX - 60, baseY - 15, baseX - 60, baseY); // Kaki depan
-        line(baseX - 20, baseY - 15, baseX - 20, baseY); // Kaki depan
-        line(baseX - 60, baseY - 15, baseX - 65, baseY - 40); // Sandaran kaki
-        line(baseX - 20, baseY - 15, baseX - 15, baseY - 40); // Sandaran kaki
-        line(baseX - 65, baseY - 40, baseX - 15, baseY - 40); // Sandaran atas
-
-        // 3. Api Unggun (dengan animasi)
-        let fireX = baseX + 150;
-        // Kayu Bakar
-        fill(80, 40, 20); stroke(40);
-        rect(fireX - 15, baseY - 5, 30, 5);
-        rect(fireX - 10, baseY - 10, 20, 5);
-        
-        // Api
-        noStroke();
+        // Api Unggun
+        let fireX = baseX + 110;
+        fill(100, 50, 20); rect(fireX - 10, baseY - 5, 20, 5);
         colorMode(HSB, 360, 100, 100);
-        let fireH = map(sin(frameCount * 0.1), -1, 1, 10, 35);
-        fill(fireH, 100, 100, 200); // Inti api
-        ellipse(fireX, baseY - 15, 15 + random(5), 25 + random(10));
-        fill(60, 100, 100, 150); // Cahaya luar api
-        ellipse(fireX, baseY - 18, 10 + random(3), 20 + random(7));
+        fill(random(10, 40), 100, 100);
+        ellipse(fireX, baseY - 15, 12, 22);
         
-        // Efek cahaya api pada tanah
-        fill( fireH, 100, 100, 30);
-        ellipse(fireX, baseY + 5, 80, 20);
-        
+        // Kursi
         colorMode(RGB, 255);
+        fill(100, 60, 30);
+        rect(baseX - 45, baseY - 12, 25, 8);
         pop();
     }
-    // ----------------------------------------------------
 
     function waterSapling() {
         if (waterLevel < 1) waterLevel += 0.2;
@@ -196,12 +149,10 @@
 
     class ShootingStar {
         constructor() {
-            // Muncul dari sisi kanan atas, tapi lebih luas
-            this.x = random(width * 0.4, width * 1.5);
-            this.y = random(height * -0.5, height * 0.3);
-            this.speed = random(15, 30); // Kecepatan dinaikkan
-            this.len = random(100, 250); // Jauh lebih panjang
-            this.thickness = random(2, 5); // Lebih tebal
+            this.x = random(width * 0.2, width);
+            this.y = random(0, height * 0.3);
+            this.speed = random(12, 28);
+            this.w = random(5, 10); // Komet tebal agar terlihat
         }
         update() {
             this.x -= this.speed;
@@ -209,67 +160,27 @@
         }
         display() {
             push();
-            // ✨ --- Perubahan: Efek Glow pada Bintang Jatuh ---
-            drawingContext.shadowBlur = 15;
-            drawingContext.shadowColor = color(255, 255, 255, 200);
-            // --------------------------------------------------
-            
-            // Ekor bintang jatuh
-            stroke(255, map(this.speed, 15, 30, 80, 230)); 
-            strokeWeight(this.thickness / 2);
-            line(this.x, this.y, this.x + this.len, this.y - this.len * 0.5);
-            
-            // Kepala bintang
-            stroke(255, 255);
-            strokeWeight(this.thickness);
-            point(this.x, this.y);
-            
-            // Kembalikan shadowBlur ke 0 biar gak pengaruh ke objek lain
-            drawingContext.shadowBlur = 0;
+            drawingContext.shadowBlur = 25;
+            drawingContext.shadowColor = 'white';
+            stroke(255);
+            strokeWeight(this.w);
+            line(this.x, this.y, this.x + 180, this.y - 90); // Ekor sangat panjang
             pop();
         }
-        offScreen() {
-            return this.x < -this.len || this.y > height + this.len;
-        }
-    }
-
-    class Leaf {
-        constructor(h, x, y) {
-            this.h = h; this.x = x; this.y = y;
-            this.alpha = 255;
-            this.size = random(3, 6);
-            this.rot = random(TWO_PI);
-            this.speedY = random(0.8, 1.8);
-            this.speedX = random(-0.8, 0.8);
-        }
-        update() {
-            this.y += this.speedY;
-            this.x += this.speedX + sin(frameCount * 0.04);
-            this.rot += 0.04;
-            if (this.y > groundY) {
-                this.y = groundY;
-                this.alpha -= 3;
-            }
-        }
-        display() {
-            colorMode(HSB, 360, 100, 100, this.alpha);
-            fill(this.h, 55, 100, this.alpha);
-            noStroke();
-            push(); translate(this.x, this.y); rotate(this.rot);
-            ellipse(0, 0, this.size, this.size*1.6);
-            pop();
-            colorMode(RGB, 255);
-        }
+        offScreen() { return this.x < -300; }
     }
 
     function drawText() {
-        fill(150); noStroke(); textFont('Courier New'); textSize(10);
-        text("creation of kai sund_blue", 25, height - 61);
-        text("09/03/2026", 25, height - 43);
-        text("Find your happiness and don't be ashamed to express it.", 25, height - 25);
+        fill(180); noStroke(); textSize(11);
+        text("creation of kai sund_blue", 25, height - 60);
+        text("09/03/2026", 25, height - 40);
+        text("Find your happiness and don't be ashamed to express it.", 25, height - 20);
     }
 
-    function windowResized() { resizeCanvas(windowWidth, windowHeight); groundY = height - 113; }
+    function windowResized() { 
+        resizeCanvas(windowWidth, windowHeight); 
+        groundY = height - 113; 
+    }
 </script>
 </body>
 </html>
