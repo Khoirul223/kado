@@ -13,7 +13,9 @@
         button {
             padding: 12px 24px; font-size: 16px; cursor: pointer; background: #333; color: white;
             border: 2px solid #000; border-radius: 5px; font-family: 'Courier New', monospace; font-weight: bold;
+            box-shadow: 0 4px #000;
         }
+        button:active { transform: translateY(2px); box-shadow: 0 2px #000; }
     </style>
 </head>
 <body>
@@ -25,39 +27,45 @@
     let isBlooming = false, growthStartTime = 0, played = false;
     let bgColor = 255; 
 
-    function preload() { song = loadSound('lagu.flower.mp3'); }
+    function preload() { 
+        song = loadSound('lagu.flower.mp3'); 
+    }
 
     function setup() {
         createCanvas(windowWidth, windowHeight);
         groundY = height - 113;
+        // Bintang malam
         for(let i=0; i<80; i++) stars.push({x: random(width), y: random(height*0.6), s: random(1,2)});
     }
 
     function draw() {
         background(bgColor);
+        
         if (waterLevel >= 1) {
             bgColor = lerp(bgColor, 0, 0.02);
             document.getElementById('ui-layer').style.display = 'none';
             drawNightSky();
         }
+        
         drawDinoGround();
 
         // Gambar Pohon
-        branchTips = []; // Reset setiap frame untuk deteksi ujung dahan
+        branchTips = []; 
         push();
         translate(width/2, groundY);
-        let treeSize = map(waterLevel, 0, 1, 0, height * 0.15);
-        drawBranch(treeSize, map(waterLevel, 0, 1, 1, 12), 0);
+        let treeSize = map(waterLevel, 0, 1, 0, height * 0.16);
+        drawBranch(treeSize, map(waterLevel, 0, 1, 1, 12));
         pop();
 
-        if (waterLevel >= 1 && bgColor < 100) {
-            if (!isBlooming) {
+        // Trigger muncul daun
+        if (waterLevel >= 1 && bgColor < 150) {
+            if (!isBlooming && branchTips.length > 0) {
                 isBlooming = true;
                 growthStartTime = millis();
-                // Buat daun sebanyak ujung dahan yang terdeteksi
-                for (let i = 0; i < 120; i++) {
-                    let tip = random(branchTips);
-                    leaves.push(new Leaf(random(330, 360), tip.x, tip.y));
+                // Buat daun di setiap ujung dahan yang terdeteksi
+                for (let i = 0; i < 150; i++) {
+                    let target = random(branchTips);
+                    leaves.push(new Leaf(random(330, 360), target.x, target.y));
                 }
             }
         }
@@ -81,35 +89,32 @@
         }
     }
 
-    // Fungsi Pohon dengan Batang Bengkok (Realistic)
-    function drawBranch(len, thickness, angle) {
+    function drawBranch(len, thickness) {
         stroke(bgColor > 100 ? 80 : 160);
         strokeWeight(max(0.5, thickness));
         
-        // Membuat batang meliuk menggunakan noise
-        let variation = map(noise(len, frameCount * 0.005), 0, 1, -0.1, 0.1);
-        let branchAngle = angle + variation;
+        // Batang meliuk (Realistic)
+        let n = noise(len * 0.1, frameCount * 0.005);
+        let rotMod = map(n, 0, 1, -0.05, 0.05);
         
         line(0, 0, 0, -len);
         translate(0, -len);
 
-        if (len > 6) {
+        if (len > 8) {
             push();
-            rotate(PI/4 * waterLevel + variation);
-            drawBranch(len * 0.75, thickness * 0.7, branchAngle);
+            rotate(PI/4 * waterLevel + rotMod);
+            drawBranch(len * 0.72, thickness * 0.7);
             pop();
             push();
-            rotate(-PI/6 * waterLevel - variation);
-            drawBranch(len * 0.75, thickness * 0.7, branchAngle);
+            rotate(-PI/6 * waterLevel - rotMod);
+            drawBranch(len * 0.72, thickness * 0.7);
             pop();
         } else {
-            // Simpan koordinat ujung dahan (global)
-            let m = substitutionMatrix();
-            branchTips.push({x: m[12] + width/2, y: m[13] + groundY});
+            // Cara baru ambil koordinat ujung dahan yang lebih akurat
+            let matrix = drawingContext.getTransform();
+            branchTips.push({ x: matrix.e, y: matrix.f });
         }
     }
-
-    function substitutionMatrix() { return drawingContext.getTransform().e, drawingContext.getTransform(); }
 
     function drawNightSky() {
         fill(255, map(bgColor, 255, 0, 0, 200)); noStroke();
@@ -135,30 +140,31 @@
 
     class Leaf {
         constructor(h, x, y) {
-            this.h = h; this.homeX = x; this.homeY = y;
+            this.h = h; this.spawnX = x; this.spawnY = y;
             this.init();
-            this.fTime = random(5000, 30000); // Lebih lama diam di pohon
+            this.fTime = random(4000, 20000); 
             this.alpha = 0;
         }
         init() {
-            this.x = this.homeX + random(-5, 5); 
-            this.y = this.homeY + random(-5, 5);
+            this.x = this.spawnX + random(-10, 10); 
+            this.y = this.spawnY + random(-10, 10);
             this.isFixed = true; this.onG = false;
-            this.size = random(6, 11);
+            this.size = random(6, 12);
             this.rot = random(TWO_PI);
-            this.fallY = random(0.3, 0.7); // SANGAT PELAN
-            this.fallX = random(-0.5, -1.5); // Tertiup ke kiri pelan
+            this.fallY = random(0.4, 0.8); // Gerak lambat
+            this.fallX = random(-0.8, -2); // Tertiup ke kiri
         }
         update() {
-            if (this.alpha < 255) this.alpha += 2;
+            if (this.alpha < 255) this.alpha += 3;
             if (this.isFixed && (millis() - growthStartTime) > this.fTime) this.isFixed = false;
+            
             if (!this.isFixed && !this.onG) {
                 this.y += this.fallY;
-                this.x += this.fallX + sin(frameCount * 0.02) * 0.5; // Efek melayang
+                this.x += this.fallX + sin(frameCount * 0.02) * 0.3; 
                 this.rot += 0.02;
-                if (this.y > groundY - 3 || this.x < -10) {
+                if (this.y > groundY - 3 || this.x < -20) {
                     this.onG = true;
-                    setTimeout(() => { this.init(); this.alpha = 0; }, 3000);
+                    setTimeout(() => { this.init(); this.alpha = 0; }, 2000);
                 }
             }
         }
