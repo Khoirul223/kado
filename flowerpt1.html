@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pohon Cinta Kai</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Mencegah scrollbar */
+            background-color: black;
+            color: white;
+            font-family: 'Courier New', Courier, monospace; /* Font aesthetic/vintage */
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    let sapling; // Objek bibit
+    let groundHeight;
+    let waterLevel = 0; // Level penyiraman (0-1)
+    let leaves = []; // Array untuk daun
+    let totalLeaves = 60; // Jumlah total daun, sedikit ditambah agar ramai
+    let isBlooming = false;
+    let groundY;
+    let growthStartTime = 0;
+    let song;
+    let played = false;
+
+    function preload() {
+        // Nama file disesuaikan persis dengan file kamu
+        soundFormats('mp3');
+        song = loadSound('lagu.flower.mp3'); 
+    }
+
+    function setup() {
+        createCanvas(windowWidth, windowHeight);
+        noStroke();
+
+        // Mengatur ketinggian tanah (3cm diasumsikan sekitar 113px)
+        groundHeight = 113; 
+        groundY = height - groundHeight;
+
+        // Membuat objek bibit
+        sapling = new Sapling();
+    }
+
+    function draw() {
+        background(0); // Latar belakang hitam pekat
+
+        // Gambar tanah (garis horizontal)
+        stroke(100); // Warna garis tanah abu-abu redup
+        strokeWeight(1.5);
+        line(0, groundY, width, groundY);
+        noStroke();
+
+        // Gambar dan update bibit
+        sapling.update();
+        sapling.display();
+
+        // Kontrol Pertumbuhan
+        // Jika waterLevel mencapai 1, pohon mulai berbunga
+        if (waterLevel >= 1 && !isBlooming) {
+          isBlooming = true;
+          growthStartTime = millis(); // Mencatat waktu mulai berbunga
+          // Buat daun
+          for (let i = 0; i < totalLeaves; i++) {
+            let hue = random(0, 360); // Warna-warni HSB
+            leaves.push(new Leaf(hue));
+          }
+        }
+
+        // Gambar dan update daun (jika sudah berbunga)
+        if (isBlooming) {
+          colorMode(HSB, 360, 100, 100, 1); // Gunakan HSB untuk warna menyala
+          for (let leaf of leaves) {
+            leaf.update();
+            leaf.display();
+          }
+          colorMode(RGB, 255); // Kembalikan ke RGB standar
+        }
+
+        // Tampilkan teks di pojok kiri bawah
+        drawText();
+    }
+
+    function mousePressed() {
+      // Penyiraman bertahap setiap klik
+      if (waterLevel < 1) {
+        waterLevel += 0.25; // Perlu 4 kali klik untuk tumbuh penuh
+      }
+
+      // Mulai putar lagu pada klik pertama (aturan browser)
+      if (!played && song.isLoaded()) {
+        song.loop(); // Putar lagu berulang
+        played = true;
+      }
+    }
+
+    function windowResized() {
+        resizeCanvas(windowWidth, windowHeight);
+        groundY = height - groundHeight;
+    }
+
+    // --- Kelas Bibit (Sapling) ---
+    class Sapling {
+      constructor() {
+        this.x = width / 2;
+        this.y = groundY;
+        this.targetHeight = height * 0.5; // Tinggi pohon relatif terhadap layar
+        this.maxStemWidth = 12; // Lebar batang maksimal
+      }
+
+      update() {
+        // Hitung tinggi dan lebar batang berdasarkan level penyiraman
+        // Menggunakan lerp untuk transisi halus
+        let targetH = map(waterLevel, 0, 1, 10, this.targetHeight);
+        this.currentHeight = lerp(this.currentHeight || 10, targetH, 0.1);
+        
+        let targetW = map(waterLevel, 0, 1, 2, this.maxStemWidth);
+        this.stemWidth = lerp(this.stemWidth || 2, targetW, 0.1);
+      }
+
+      display() {
+        // Gambar batang pohon (Warna abu-abu)
+        stroke(150); // Abu-abu
+        strokeWeight(this.stemWidth);
+        line(this.x, this.y, this.x, this.y - this.currentHeight);
+        noStroke();
+
+        // Instruksi awal
+        if (waterLevel < 1) {
+            fill(200);
+            textAlign(CENTER, CENTER);
+            textFont('Courier New');
+            textSize(16);
+            text("Tap/Klik beberapa kali untuk menyiram", width / 2, height / 2 - 50);
+        }
+      }
+    }
+
+    // --- Kelas Daun (Leaf) - Bentuk Hati, Menyala, Gugur Lambat ---
+    class Leaf {
+      constructor(hue) {
+        this.pohonX = width / 2;
+        // Posisi puncak pohon dihitung dari tinggi target pohon
+        this.pohonY = groundY - (height * 0.5); 
+        
+        this.size = random(8, 16); // Ukuran love bervariasi
+        this.hue = hue;
+        
+        // --- Setting Gugur Lambat (Dramatis) ---
+        this.fallSpeed = random(0.5, 1.2); // SANGAT LAMBAT
+        this.driftSpeed = random(-0.3, 0.3); // Angin horizontal tipis
+        this.windWiggle = random(0.02, 0.05); // Kecepatan ayunan
+
+        // Atur agar daun muncul menggerombol di sekitar puncak pohon
+        let angle = random(TWO_PI);
+        let radius = random(0, 80);
