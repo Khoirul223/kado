@@ -1,211 +1,324 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pohon Cinta Kai</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+    <title>Garden of Smiles</title>
     <style>
-        body { margin: 0; overflow: hidden; font-family: 'Courier New', monospace; background-color: white; }
-        canvas { display: block; }
-        #ui-layer { position: absolute; bottom: 150px; width: 100%; text-align: center; z-index: 10; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Langit & Awan */
+        .sky {
+            position: relative;
+            height: 100vh;
+            background: linear-gradient(to bottom, #f0f8ff, #ffffff);
+        }
+
+        .cloud {
+            position: absolute;
+            background: #fff;
+            width: 100px;
+            height: 40px;
+            border-radius: 50px;
+            opacity: 0.8;
+            filter: blur(5px);
+            animation: moveClouds 20s linear infinite;
+        }
+
+        @keyframes moveClouds {
+            from { left: -150px; }
+            to { left: 100vw; }
+        }
+
+        /* Tanah ala Chrome Dino */
+        .ground {
+            position: absolute;
+            bottom: 100px;
+            width: 100%;
+            height: 2px;
+            background: #535353;
+        }
+
+        .ground-detail {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            height: 20px;
+            background-image: radial-gradient(#535353 1px, transparent 1px);
+            background-size: 50px 20px;
+            opacity: 0.3;
+        }
+
+        /* Area Pohon & Api Unggun */
+        .scene {
+            position: absolute;
+            bottom: 102px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .bench {
+            width: 60px;
+            height: 30px;
+            border: 3px solid #5d4037;
+            border-bottom: none;
+            position: relative;
+            margin: 0 40px;
+        }
+
+        /* Api Unggun */
+        .campfire {
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+        .log {
+            position: absolute;
+            width: 30px;
+            height: 8px;
+            background: #5d4037;
+            bottom: 0;
+            transform: rotate(-20deg);
+        }
+        .fire {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            background: orange;
+            border-radius: 50% 50% 20% 20%;
+            filter: blur(2px);
+            box-shadow: 0 0 15px orange, 0 0 25px red;
+            animation: flicker 0.15s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Pohon */
+        #tree-container {
+            position: absolute;
+            right: 15%;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            filter: drop-shadow(0 0 5px rgba(255, 0, 150, 0.3));
+        }
+
+        /* Kontrol */
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+
         button {
-            padding: 12px 24px; font-size: 16px; cursor: pointer; background: #333; color: white;
-            border: 2px solid #000; border-radius: 5px; font-weight: bold;
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 50px;
+            border: none;
+            background: #ff4081;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        button:hover { transform: scale(1.1); }
+
+        /* Footer Teks */
+        .footer-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: #535353;
+            font-size: 14px;
+            max-width: 300px;
+        }
+
+        .quotes {
+            font-style: italic;
+            margin-top: 5px;
+            color: #888;
         }
     </style>
 </head>
 <body>
-    <div id="ui-layer"><button id="waterBtn" onclick="waterSapling()">Siram Bibit 💧</button></div>
 
-<script>
-    let groundY, song, waterLevel = 0;
-    let leaves = [], stars = [], shootingStars = [];
-    let isBlooming = false, growthStartTime = 0, played = false;
-    let bgColor = 255; 
+    <div class="sky" id="sky">
+        <div class="controls">
+            <button onclick="growTree()">💧 Siram Pohon</button>
+        </div>
 
-    function preload() { 
-        // Pastikan file ini ada di GitHub kamu
-        song = loadSound('lagu.flower.mp3'); 
-    }
+        <div class="scene">
+            <div class="bench" style="transform: scaleX(-1);"></div>
+            <div class="campfire">
+                <div class="log" style="transform: rotate(20deg);"></div>
+                <div class="log"></div>
+                <div class="fire"></div>
+            </div>
+            <div class="bench"></div>
+        </div>
 
-    function setup() {
-        createCanvas(windowWidth, windowHeight);
-        groundY = height - 113;
-        for(let i=0; i<80; i++) stars.push({x: random(width), y: random(height*0.6), s: random(1,2)});
-    }
+        <div id="tree-container">
+            <canvas id="treeCanvas"></canvas>
+        </div>
 
-    function draw() {
-        background(bgColor);
-        
-        if (waterLevel >= 1) {
-            bgColor = lerp(bgColor, 0, 0.02);
-            document.getElementById('ui-layer').style.display = 'none';
-            drawNightSky();
-            drawCampfireScene(); // Tambahkan api unggun & kursi
-        }
-        
-        drawDinoGround();
+        <div class="ground"></div>
+        <div class="ground-detail"></div>
 
-        // Gambar Pohon (Digeser ke kanan: width * 0.7)
-        push();
-        translate(width * 0.7, groundY);
-        let treeSize = map(waterLevel, 0, 1, 0, height * 0.16);
-        drawBranch(treeSize, map(waterLevel, 0, 1, 1, 12));
-        pop();
+        <div class="footer-info">
+            <div>creation of kai sund_blue</div>
+            <div id="current-date"></div>
+            <div class="quotes">"Find your happiness and don't be shy to express it because the world knows that you have a beautiful smile"</div>
+        </div>
+    </div>
 
-        if (isBlooming) {
-            for (let i = leaves.length - 1; i >= 0; i--) {
-                leaves[i].update();
-                leaves[i].display();
-            }
-            drawText();
-        }
-    }
+    <audio id="bgm" loop>
+        <source src="flower.mp3" type="audio/mpeg">
+    </audio>
 
-    function drawCampfireScene() {
-        let centerX = width / 2 - 50;
-        let ground = groundY;
+    <script>
+        // Tanggal Hari Ini
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
 
-        // Kursi Kiri
-        stroke(100); strokeWeight(3);
-        line(centerX - 80, ground, centerX - 80, ground - 20); // kaki
-        line(centerX - 40, ground, centerX - 40, ground - 20); // kaki
-        line(centerX - 90, ground - 20, centerX - 30, ground - 20); // dudukan
-        line(centerX - 85, ground - 20, centerX - 85, ground - 45); // sandaran
+        // Setup Canvas untuk Pohon
+        const canvas = document.getElementById('treeCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 400;
+        canvas.height = 400;
 
-        // Kursi Kanan (Berhadapan)
-        line(centerX + 80, ground, centerX + 80, ground - 20);
-        line(centerX + 40, ground, centerX + 40, ground - 20);
-        line(centerX + 90, ground - 20, centerX + 30, ground - 20);
-        line(centerX + 85, ground - 20, centerX + 85, ground - 45);
+        let growthStep = 0;
+        let leaves = [];
+        let windAngle = 0;
 
-        // Kayu Api Unggun
-        stroke(60, 30, 10); strokeWeight(4);
-        line(centerX - 10, ground, centerX + 10, ground - 5);
-        line(centerX + 10, ground, centerX - 10, ground - 5);
+        function drawTree(step) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (step === 0) return; // Bibit belum ada
 
-        // Animasi Api
-        noStroke();
-        for (let i = 0; i < 5; i++) {
-            fill(255, random(100, 200), 0, 200);
-            let fireH = random(15, 35);
-            ellipse(centerX + random(-5, 5), ground - 5 - random(0, 10), random(10, 20), fireH);
-        }
-        // Cahaya Api (Glow)
-        fill(255, 150, 0, 30);
-        ellipse(centerX, ground - 10, 60, 60);
-    }
-
-    function drawDinoGround() {
-        stroke(bgColor > 100 ? 50 : 180); strokeWeight(2);
-        line(0, groundY, width, groundY);
-    }
-
-    function drawBranch(len, thickness) {
-        stroke(bgColor > 100 ? 80 : 160);
-        strokeWeight(max(0.5, thickness));
-        
-        let n = noise(len * 0.1, frameCount * 0.005);
-        let rotMod = map(n, 0, 1, -0.05, 0.05);
-        
-        line(0, 0, 0, -len);
-        translate(0, -len);
-
-        if (len > 8) {
-            push();
-            rotate(PI/4 * waterLevel + rotMod);
-            drawBranch(len * 0.72, thickness * 0.7);
-            pop();
-            push();
-            rotate(-PI/6 * waterLevel - rotMod);
-            drawBranch(len * 0.72, thickness * 0.7);
-            pop();
-        } else if (waterLevel >= 1 && bgColor < 150) {
-            // Logika baru: Ambil posisi dahan saat ini menggunakan screenX/screenY
-            if (!isBlooming) {
-                isBlooming = true;
-                growthStartTime = millis();
-            }
-            if (leaves.length < 400 && random(1) < 0.15) {
-                // screenX dan screenY memastikan bunga muncul tepat di koordinat dahan terakhir
-                leaves.push(new Leaf(random(330, 360), screenX(0,0), screenY(0,0)));
+            const startX = canvas.width / 2;
+            const startY = canvas.height;
+            
+            if (step === 1) { // Bibit
+                ctx.fillStyle = "brown";
+                ctx.fillRect(startX - 2, startY - 10, 4, 10);
+            } else if (step === 2) { // Tunas
+                ctx.strokeStyle = "green";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.quadraticCurveTo(startX + 5, startY - 20, startX + 10, startY - 30);
+                ctx.stroke();
+            } else { // Pohon Realistic
+                const len = step * 15;
+                drawBranch(startX, startY, len, 0, 10);
             }
         }
-    }
 
-    function drawNightSky() {
-        fill(255, map(bgColor, 255, 0, 0, 200)); noStroke();
-        for(let s of stars) ellipse(s.x, s.y, s.s);
-        if (random(1) < 0.01) shootingStars.push(new ShootingStar());
-        for (let i = shootingStars.length - 1; i >= 0; i--) {
-            shootingStars[i].update(); shootingStars[i].display();
-            if (shootingStars[i].offScreen()) shootingStars.splice(i, 1);
-        }
-    }
+        function drawBranch(x, y, len, angle, branchWidth) {
+            ctx.beginPath();
+            ctx.save();
+            ctx.strokeStyle = "#5d4037";
+            ctx.lineWidth = branchWidth;
+            ctx.translate(x, y);
+            ctx.rotate((angle + Math.sin(windAngle) * 0.05) * Math.PI / 180);
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -len);
+            ctx.stroke();
 
-    function waterSapling() {
-        if (waterLevel < 1) waterLevel += 0.2;
-        if (!played && song && song.isLoaded()) { song.loop(); played = true; }
-    }
-
-    class ShootingStar {
-        constructor() { this.x = random(width); this.y = random(height*0.3); this.speed = 15; }
-        update() { this.x -= this.speed; this.y += this.speed*0.4; }
-        display() { stroke(255, 150); line(this.x, this.y, this.x + 40, this.y - 16); }
-        offScreen() { return this.x < -100; }
-    }
-
-    class Leaf {
-        constructor(h, x, y) {
-            this.h = h; this.spawnX = x; this.spawnY = y;
-            this.init();
-            this.alpha = 0;
-            this.fTime = random(2000, 15000); 
-        }
-        init() {
-            this.x = this.spawnX; this.y = this.spawnY;
-            this.isFixed = true; this.onG = false;
-            this.size = random(6, 10);
-            this.rot = random(TWO_PI);
-            this.fallY = random(0.8, 1.5);
-            this.fallX = random(-1, 1);
-        }
-        update() {
-            if (this.alpha < 255) this.alpha += 5;
-            if (this.isFixed && (millis() - growthStartTime) > this.fTime) this.isFixed = false;
-            if (!this.isFixed && !this.onG) {
-                this.y += this.fallY;
-                this.x += this.fallX + sin(frameCount * 0.02) * 0.5;
-                this.rot += 0.05;
-                if (this.y > groundY - 3) {
-                    this.onG = true;
-                    setTimeout(() => { this.init(); this.alpha = 0; }, 3000);
+            if (len < 15) {
+                // Daun Neon
+                ctx.beginPath();
+                ctx.fillStyle = Math.random() > 0.5 ? "#ff007f" : "#ff4d4d"; // Pink/Merah Neon
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = ctx.fillStyle;
+                ctx.ellipse(0, -len, 8, 4, Math.random(), 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Tambahkan efek daun berguguran
+                if (Math.random() > 0.98) {
+                    createFallingLeaf(x, y - len);
                 }
+                
+                ctx.restore();
+                return;
+            }
+
+            drawBranch(0, -len, len * 0.75, angle + 25, branchWidth * 0.7);
+            drawBranch(0, -len, len * 0.75, angle - 25, branchWidth * 0.7);
+            ctx.restore();
+        }
+
+        function growTree() {
+            const audio = document.getElementById('bgm');
+            audio.play().catch(() => {}); // Autoplay bypass
+            
+            if (growthStep < 6) {
+                growthStep++;
             }
         }
-        display() {
-            colorMode(HSB, 360, 100, 100, 255);
-            fill(this.h, 80, 100, this.alpha); noStroke();
-            push(); translate(this.x, this.y); rotate(this.rot);
-            beginShape(); 
-            vertex(0,0); 
-            bezierVertex(-this.size, -this.size/2, -this.size, this.size, 0, this.size);
-            bezierVertex(this.size, this.size, this.size, -this.size/2, 0,0); 
-            endShape(CLOSE);
-            pop();
-            colorMode(RGB, 255);
-        }
-    }
 
-    function drawText() {
-        fill(180); noStroke(); textFont('Courier New'); textSize(10);
-        text("creation of kai sund_blue", 25, height - 61);
-        text("09/03/2026", 25, height - 43);
-        text("Find your happiness and don't be ashamed to express it.", 25, height - 25);
-    }
-    function windowResized() { resizeCanvas(windowWidth, windowHeight); groundY = height - 113; }
-</script>
+        function createFallingLeaf(x, y) {
+            leaves.push({
+                x: x + (canvas.width / 2) + 50, // Penyesuaian posisi canvas
+                y: canvas.height - y + 150,
+                speedY: 0.5 + Math.random(),
+                speedX: (Math.random() - 0.5) * 1,
+                color: Math.random() > 0.5 ? "#ff007f" : "#ff4d4d"
+            });
+        }
+
+        function animate() {
+            windAngle += 0.02;
+            drawTree(growthStep);
+            
+            // Render Daun Gugur di luar canvas pohon
+            leaves.forEach((leaf, index) => {
+                leaf.y += leaf.speedY;
+                leaf.x += Math.sin(windAngle + index);
+                
+                const leafDiv = document.createElement('div');
+                ctx.shadowBlur = 5;
+                ctx.fillStyle = leaf.color;
+                ctx.beginPath();
+                ctx.arc(leaf.x - 100, leaf.y - 100, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (leaf.y > window.innerHeight) leaves.splice(index, 1);
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Generate Awan Acak
+        for (let i = 0; i < 5; i++) {
+            let cloud = document.createElement('div');
+            cloud.className = 'cloud';
+            cloud.style.top = Math.random() * 200 + 'px';
+            cloud.style.animationDelay = Math.random() * 20 + 's';
+            document.getElementById('sky').appendChild(cloud);
+        }
+
+        animate();
+    </script>
 </body>
 </html>
