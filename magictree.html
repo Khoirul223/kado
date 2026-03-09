@@ -21,18 +21,20 @@
 
 <script>
     let groundY, song, waterLevel = 0;
-    let leaves = [], stars = [], shootingStars = [];
+    let fallingLeaves = [], stars = [], shootingStars = [];
     let isBlooming = false, growthStartTime = 0, played = false;
     let bgColor = 255; 
 
     function preload() { 
+        // Pastikan file ini ada di GitHub kamu dengan nama yang sama
         song = loadSound('lagu.flower.mp3'); 
     }
 
     function setup() {
         createCanvas(windowWidth, windowHeight);
         groundY = height - 113;
-        for(let i=0; i<80; i++) stars.push({x: random(width), y: random(height*0.6), s: random(1,2)});
+        // Inisialisasi bintang latar belakang
+        for(let i=0; i<100; i++) stars.push({x: random(width), y: random(height*0.7), s: random(1,2.5)});
     }
 
     function draw() {
@@ -46,16 +48,19 @@
         
         drawDinoGround();
 
+        // Gambar Pohon
         push();
         translate(width/2, groundY);
         let treeSize = map(waterLevel, 0, 1, 0, height * 0.16);
         drawBranch(treeSize, map(waterLevel, 0, 1, 1, 12));
         pop();
 
+        // Gambar Daun yang Jatuh
         if (isBlooming) {
-            for (let i = leaves.length - 1; i >= 0; i--) {
-                leaves[i].update();
-                leaves[i].display();
+            for (let i = fallingLeaves.length - 1; i >= 0; i--) {
+                fallingLeaves[i].update();
+                fallingLeaves[i].display();
+                if (fallingLeaves[i].alpha <= 0) fallingLeaves.splice(i, 1);
             }
             drawText();
         }
@@ -64,18 +69,7 @@
     function drawDinoGround() {
         stroke(bgColor > 100 ? 50 : 180); strokeWeight(2);
         line(0, groundY, width, groundY);
-        
-        // Tambahan Rumput-rumput kecil
-        randomSeed(99); 
-        for (let i = 0; i < width; i += 15) {
-            let h = random(5, 12);
-            let xOff = random(-5, 5);
-            if (random() > 0.4) {
-                line(i + xOff, groundY, i + xOff + random(-2, 2), groundY - h);
-            }
-        }
-
-        // Garis-garis detail tanah (Dino Style)
+        randomSeed(99);
         for (let i = 0; i < width; i += 60) {
             if (random() > 0.6) {
                 let x = i + random(-20, 20);
@@ -90,7 +84,7 @@
         strokeWeight(max(0.5, thickness));
         
         let n = noise(len * 0.1, frameCount * 0.005);
-        let rotMod = map(n, 0, 1, -0.05, 0.05);
+        let rotMod = map(n, 0, 1, -0.03, 0.03);
         
         line(0, 0, 0, -len);
         translate(0, -len);
@@ -104,27 +98,50 @@
             rotate(-PI/6 * waterLevel - rotMod);
             drawBranch(len * 0.72, thickness * 0.7);
             pop();
-        } else if (waterLevel >= 0.9 && bgColor < 200) {
+        } else if (waterLevel >= 1 && bgColor < 200) {
             if (!isBlooming) {
                 isBlooming = true;
                 growthStartTime = millis();
             }
-            if (leaves.length < 400 && random(1) < 0.15) {
-                // Perbaikan: Mengambil posisi absolut di layar
-                let matrix = drawingContext.getTransform();
-                leaves.push(new Leaf(random(330, 360), matrix.e, matrix.f));
+            
+            // 1. Gambar Bunga (Tetap di dahan)
+            drawFlowerOnBranch();
+
+            // 2. Logika Daun Jatuh (Sesekali muncul)
+            if (random(1) < 0.008) { 
+                let m = drawingContext.getTransform();
+                fallingLeaves.push(new Leaf(random(330, 360), m.e, m.f));
             }
         }
     }
 
+    function drawFlowerOnBranch() {
+        push();
+        colorMode(HSB, 360, 100, 100, 255);
+        noStroke();
+        fill(random(330, 360), 65, 100, 180);
+        // Gambar kelopak kecil melingkar
+        for(let i=0; i<5; i++) {
+            ellipse(0, 0, 7, 4);
+            rotate(TWO_PI/5);
+        }
+        pop();
+    }
+
     function drawNightSky() {
-        fill(255, map(bgColor, 255, 0, 0, 200)); noStroke();
+        // Bintang latar belakang makin terang saat makin malam
+        fill(255, map(bgColor, 255, 0, 0, 230)); noStroke();
         for(let s of stars) ellipse(s.x, s.y, s.s);
-        if (random(1) < 0.01) shootingStars.push(new ShootingStar());
+        
+        // --- Bagian yang Diubah: Bintang Jatuh Lebih Banyak ---
+        // Probabilitas muncul dinaikkan dari 0.01 ke 0.04 (4x lebih sering)
+        if (random(1) < 0.04) shootingStars.push(new ShootingStar());
+        
         for (let i = shootingStars.length - 1; i >= 0; i--) {
             shootingStars[i].update(); shootingStars[i].display();
             if (shootingStars[i].offScreen()) shootingStars.splice(i, 1);
         }
+        // --------------------------------------------------------
     }
 
     function waterSapling() {
@@ -133,63 +150,69 @@
     }
 
     class ShootingStar {
-        constructor() { this.x = random(width); this.y = random(height*0.3); this.speed = 15; }
-        update() { this.x -= this.speed; this.y += this.speed*0.4; }
-        display() { stroke(255, 150); line(this.x, this.y, this.x + 40, this.y - 16); }
-        offScreen() { return this.x < -100; }
+        constructor() {
+            this.x = random(width * 0.5, width * 1.2); // Muncul lebih ke kanan
+            this.y = random(height * -0.2, height * 0.4); // Bisa muncul dari atas layar
+            this.speed = random(10, 20); // Kecepatan bervariasi
+            this.len = random(30, 80); // Panjang ekor bervariasi
+        }
+        update() {
+            this.x -= this.speed;
+            this.y += this.speed * 0.5; // Sudut jatuh bervariasi
+        }
+        display() {
+            // Ekor bintang jatuh
+            stroke(255, map(this.speed, 10, 20, 100, 200)); 
+            strokeWeight(map(this.speed, 10, 20, 1, 3));
+            line(this.x, this.y, this.x + this.len, this.y - this.len * 0.5);
+            
+            // Kepala bintang (lebih terang)
+            stroke(255, 255);
+            strokeWeight(map(this.speed, 10, 20, 2, 5));
+            point(this.x, this.y);
+        }
+        offScreen() {
+            // Hilang jika sudah melewati batas kiri atau bawah
+            return this.x < -this.len || this.y > height + this.len;
+        }
     }
 
     class Leaf {
         constructor(h, x, y) {
-            this.h = h; 
-            this.spawnX = x; 
-            this.spawnY = y;
-            this.init();
-            this.alpha = 0;
-            this.fTime = random(3000, 20000); 
-        }
-        init() {
-            this.x = this.spawnX; this.y = this.spawnY;
-            this.isFixed = true; this.onG = false;
-            this.size = random(4, 7);
+            this.h = h; this.x = x; this.y = y;
+            this.alpha = 255;
+            this.size = random(3, 6);
             this.rot = random(TWO_PI);
-            this.fallY = random(0.5, 1.2);
-            this.fallX = random(-0.8, -1.8);
+            this.speedY = random(0.8, 1.8);
+            this.speedX = random(-0.8, 0.8);
         }
         update() {
-            if (this.alpha < 255) this.alpha += 5;
-            // Bunga jatuh setelah beberapa waktu
-            if (this.isFixed && (millis() - growthStartTime) > this.fTime) this.isFixed = false;
-            
-            if (!this.isFixed && !this.onG) {
-                this.y += this.fallY;
-                this.x += this.fallX + sin(frameCount * 0.02) * 0.5;
-                this.rot += 0.05;
-                if (this.y > groundY - 2) {
-                    this.onG = true;
-                    setTimeout(() => { this.init(); this.alpha = 0; }, 3000);
-                }
+            this.y += this.speedY;
+            this.x += this.speedX + sin(frameCount * 0.04);
+            this.rot += 0.04;
+            if (this.y > groundY) {
+                this.y = groundY;
+                this.alpha -= 3; // Menghilang lebih cepat saat menyentuh tanah
             }
         }
         display() {
-            colorMode(HSB, 360, 100, 100, 255);
-            fill(this.h, 70, 100, this.alpha); noStroke();
-            push(); 
-            translate(this.x, this.y); 
-            rotate(this.rot);
-            // Gambar kelopak bunga sederhana
-            ellipse(0, 0, this.size, this.size/2);
+            colorMode(HSB, 360, 100, 100, this.alpha);
+            fill(this.h, 55, 100, this.alpha);
+            noStroke();
+            push(); translate(this.x, this.y); rotate(this.rot);
+            ellipse(0, 0, this.size, this.size*1.6);
             pop();
             colorMode(RGB, 255);
         }
     }
 
     function drawText() {
-        fill(180); noStroke(); textFont('Courier New'); textSize(10);
+        fill(150); noStroke(); textFont('Courier New'); textSize(10);
         text("creation of kai sund_blue", 25, height - 61);
         text("09/03/2026", 25, height - 43);
         text("Find your happiness and don't be ashamed to express it.", 25, height - 25);
     }
+
     function windowResized() { resizeCanvas(windowWidth, windowHeight); groundY = height - 113; }
 </script>
 </body>
