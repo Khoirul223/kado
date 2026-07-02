@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Acha</title>
+    <!-- Mengambil font dari Google Fonts: Poppins untuk teks biasa, Caveat untuk tulisan tangan -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            font-family: 'Poppins', sans-serif;
+            height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+            color: white;
+            user-select: none; /* Mencegah seleksi teks */
+        }
+        
+        .screen { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
+        .active { 
+            display: flex; 
+            animation: fadeIn 1.5s ease-in-out; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        /* Layar Intro */
+        .intro-text { 
+            font-family: 'Caveat', cursive; 
+            font-size: 2.2rem; 
+            line-height: 1.5;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* Layar Numpad (PIN) */
+        h2 { font-weight: 600; font-size: 1.5rem; margin-bottom: 30px; letter-spacing: 1px; }
+        .pin-dots { display: flex; gap: 15px; margin-bottom: 40px; }
+        .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; transition: all 0.2s; }
+        .dot.filled { background: white; transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 280px; margin: 0 auto; }
+        .num-btn { 
+            width: 65px; height: 65px; 
+            border-radius: 50%; border: 2px solid white; 
+            background: transparent; color: white; 
+            font-size: 1.5rem; font-weight: 600;
+            display: flex; justify-content: center; align-items: center; 
+            cursor: pointer; transition: 0.2s; 
+        }
+        .num-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
+        
+        /* Modal Peringatan (PIN Salah) */
+        #modal { 
+            display: none; position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.4); 
+            justify-content: center; align-items: center; z-index: 100;
+            animation: fadeIn 0.3s;
+        }
+        .modal-content { 
+            background: white; color: #ff6b81; padding: 25px; 
+            border-radius: 15px; text-align: center; width: 80%; max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .modal-btn { 
+            background: #ff6b81; color: white; border: none; 
+            padding: 10px 25px; border-radius: 20px; margin-top: 15px; 
+            font-weight: bold; cursor: pointer; font-family: 'Poppins';
+        }
+        
+        /* Layar Pesan Panjang */
+        .message-box { 
+            background: rgba(255, 255, 255, 0.95); 
+            color: #4a4a4a; padding: 25px; border-radius: 15px; 
+            width: 90%; max-width: 400px; height: 65vh; 
+            overflow-y: auto; font-family: 'Caveat', cursive; 
+            font-size: 1.5rem; text-align: left; line-height: 1.4; 
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .message-box::-webkit-scrollbar { width: 6px; }
+        .message-box::-webkit-scrollbar-thumb { background: #ff9a9e; border-radius: 10px; }
+        .next-btn { 
+            background: white; color: #ff6b81; border: none; 
+            padding: 12px 35px; border-radius: 30px; 
+            font-weight: 600; font-size: 1.1rem; cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); font-family: 'Poppins';
+            transition: 0.3s;
+        }
+        .next-btn:active { transform: scale(0.95); }
+        
+        /* Layar Prank (Tombol Kamera) */
+        .caption { font-family: 'Caveat', cursive; font-size: 1.8rem; margin-bottom: 25px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); padding: 0 20px;}
+        .cam-btn { 
+            font-size: 4rem; background: none; border: none; cursor: pointer; 
+            transition: 0.2s; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+        }
+        .cam-btn:active { transform: scale(0.9); }
+        
+        /* Efek Kilat / Flashbang */
+        #flashbang { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; z-index: 999; display: none; opacity: 0; 
+            transition: opacity 0.3s; 
+        }
+        
+        /* Layar Foto */
+        .photo-img { 
+            width: 85%; max-width: 320px; border-radius: 15px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2); margin-bottom: 25px; 
+            border: 5px solid white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio BGM -->
+    <audio id="bgm" src="laguuntukacha.mp3" loop></audio>
+    
+    <!-- LAYAR 1: INTRO -->
+    <div id="screen1" class="screen active">
+        <div class="intro-text">
+            I made this website just for u<br>
+            <b style="font-size: 2.8rem;">"Ashanty Sariayu Dewi"</b>
+        </div>
+    </div>
+
+    <!-- LAYAR 2: LOCK SCREEN -->
+    <div id="screen2" class="screen">
+        <h2>Enter Secret PIN</h2>
+        <div class="pin-dots" id="pin-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <div class="numpad">
+            <div class="num-btn" onclick="addPin('1')">1</div>
+            <div class="num-btn" onclick="addPin('2')">2</div>
+            <div class="num-btn" onclick="addPin('3')">3</div>
+            <div class="num-btn" onclick="addPin('4')">4</div>
+            <div class="num-btn" onclick="addPin('5')">5</div>
+            <div class="num-btn" onclick="addPin('6')">6</div>
+            <div class="num-btn" onclick="addPin('7')">7</div>
+            <div class="num-btn" onclick="addPin('8')">8</div>
+            <div class="num-btn" onclick="addPin('9')">9</div>
+            <div class="num-btn" onclick="clearPin()" style="font-size: 1.2rem; font-weight: normal;">C</div>
+            <div class="num-btn" onclick="addPin('0')">0</div>
+            <div></div>
+        </div>
+    </div>
+
+    <!-- MODAL PIN SALAH -->
+    <div id="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; font-family: 'Poppins', sans-serif;">PIN Salah!</h3>
+            <p style="font-family: 'Poppins', sans-serif; font-size: 0.9rem;">Salah nih 😝<br>Coba pakai tanggal lahir kamu</p>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <!-- LAYAR 3: PESAN PANJANG -->
+    <div id="screen3" class="screen">
+        <div class="message-box">
+            haii Achaaaa! 🌻<br><br>
+            Gimana hari-hari nya akhir-akhir ini? Semoga selalu baik yaa. Lagi seneng atau lagi banyak kepikiran nihh? Kalau lagi capek atau ada yang bikin kepikiran, semoga semuanya cepat selesai yaaa.<br><br>
+            Terus, hari ini udah sarapan belum?? Jangan sampai telat makan yaa. Udah mandi jugaa? hhehe. Terusss, udah nonton Windah atau dracin belumm? Atau lagi sibuk ngelakuin aktivitas yang lain nihh? Semoga apa pun yang lagi kamu lakuin hari ini lancar yaa.<br><br>
+            Sebenernya aku mau nyampein sesuatu...<br><br>
+            Maaf yaaa kalau akhir-akhir ini aku sering bikin chat jadi centang satu. Kamu juga pasti tau kan kenapanya. Maaf banget kalau itu bikin kamu nunggu atau bikin suasana jadi beda.<br><br>
+            Terus... akhir-akhir ini aku juga ngerasa aku jadi ngebosenin gitu nyak. Rasanya aku udah nggak selucu dulu, nggak seseru dulu. kalau misalnya kamu ngerasa kayak gitu, aku minta maaf banget yaa. Tapi kalau ternyata kamu nggak ngerasa sama sekali, syukur deh. Mungkin ini cuma ketakutan aku aja. Aku cuma takut suatu saat kamu ngerasa bosen sama aku.<br><br>
+            Kalau boleh jujur, aku pengen banget suatu hari nanti kita bisa main bareng, jalan-jalan bareng, nonton bareng, ngobrol langsung tanpa harus lewat chat. pasti seru banget sihh yaa. Cuma sayangnya sekarang masih belum bisa. Semoga nanti, di waktu yang tepat, kita beneran bisa ngelakuin itu semua.<br><br>
+            Maaf yaa, buat sekarang aku cuma bisa bikin hal-hal sederhana kayak gini. semoga walaupun sederhana, ini bisa bikin kamu senyum atau seenggaknya bikin hari kamu sedikit lebih baik.<br><br>
+            Terus yaa, kalau lagi ada masalah, lagi capek, lagi sedih, atau cuma pengen cerita hal random juga gppaa.. cerita aja yaa ke aku. Aku bakal dengerin kok. Siapa tau dengan kamu cerita, beban kamu jadi lebih ringan. Dan siapa tau juga aku bisa bantu, walaupun cuma sedikit. Jadi jangan dipendem sendirian yaa.<br><br>
+            maaf jugaa kalau pesan ny kedengeran alay. hhehe. Soalnya jujur aja, akhir-akhir ini aku sempet kepikiran... jangan-jangan kamu udah mulai bosen sama aku. mungkin itu cuma perasaan aku aja sihh... Karena jujur aku percaya sama kamu. Aku cuma lagi kepikiran aja, makanya pengen ngomong daripada dipendem sendiri.<br><br>
+            udaa deh, itu aja yang mau aku sampeinn.<br><br>
+            maaf nihh kalau ganggu waktu kamu lagi nonton, lagi istirahat, atau lagi sibuk sama aktivitas yang lain.<br><br>
+            semoga hari-hari nya selalu dipenuhi hal-hal baik, selalu dikasih kesehatan, dimudahin semua urusannya, dan semoga senyum nya nggak pernah hilang.<br><br>
+            makasiii yaa, udah mau baca semuanya sampai selesai.<br><br>
+            - Ikramu
+        </div>
+        <button class="next-btn" onclick="nextScreen(4)">Next</button>
+    </div>
+
+    <!-- LAYAR 4: PRANK KAMERA -->
+    <div id="screen4" class="screen">
+        <div class="caption">coba pose dulu sini pencet tombol kamera nya yaa 🤭</div>
+        <button class="cam-btn" onclick="triggerFlash()">📸</button>
+    </div>
+
+    <div id="flashbang"></div>
+
+    <!-- LAYAR 5: FOTO WINDAH (PRANK) -->
+    <div id="screen5" class="screen">
+        <img src="1000108396.jpg" class="photo-img" alt="Prank Photo">
+        <div class="caption">ihh miripp... hehhehe bercandaa, salah akuu coba pencet dulu</div>
+        <button class="next-btn" onclick="nextScreen(6)">Next</button>
+    </div>
+
+    <!-- LAYAR 6: FOTO ACHA KECIL -->
+    <div id="screen6" class="screen">
+        <img src="1000108389.jpg" class="photo-img" alt="Acha Photo">
+        <div class="caption" style="font-size: 1.6rem;">wihh lucu naa🤭, semoga senyum / nyengir kamuu ngga pernah pudar yaa whatever the problem, If anything happens, I'm here, okay?</div>
+    </div>
+
+    <script>
+        // Logika untuk memutar musik saat interaksi pertama
+        let audioPlayed = false;
+        function playAudio() {
+            if(!audioPlayed) {
+                let bgm = document.getElementById('bgm');
+                // Mengurangi volume sedikit agar tidak mengagetkan
+                bgm.volume = 0.5;
+                bgm.play().catch(e => console.log('Autoplay dicegah browser'));
+                audioPlayed = true;
+            }
+        }
+
+        // Pindah dari Intro ke Lock Screen setelah 3.5 detik
+        setTimeout(() => {
+            nextScreen(2);
+        }, 3500);
+
+        // Logika PIN
+        let pin = "";
+        function addPin(num) {
+            playAudio(); // Trigger lagu saat user pertama kali menyentuh layar
+            if(pin.length < 4) {
+                pin += num;
+                updateDots();
+            }
+            if(pin.length === 4) {
+                // Beri jeda sebentar sebelum mengecek PIN
+                setTimeout(checkPin, 300);
+            }
+        }
+
+        function clearPin() {
+            pin = "";
+            updateDots();
+        }
+
+        function updateDots() {
+            let dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if(index < pin.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            });
+        }
+
+        function checkPin() {
+            // Cek apakah PIN = 1303 (13 Maret)
+            if(pin === "1303") {
+                nextScreen(3);
+            } else {
+                document.getElementById('modal').style.display = 'flex';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            clearPin();
+        }
+
+        // Fungsi navigasi layar
+        function nextScreen(num) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen' + num).classList.add('active');
+        }
+
+        // Logika Flashbang Kamera
+        function triggerFlash() {
+            let fb = document.getElementById('flashbang');
+            fb.style.display = 'block';
+            
+            // Efek putih mendadak
+            setTimeout(() => { fb.style.opacity = '1'; }, 50);
+            
+            // Pindah layar saat layar sedang putih, lalu hilangkan efek putihnya
+            setTimeout(() => { 
+                nextScreen(5);
+                setTimeout(() => {
+                    fb.style.opacity = '0';
+                    setTimeout(() => { fb.style.display = 'none'; }, 300);
+                }, 400); // Durasi layar putih
+            }, 600); 
+        }
+    </script>
+</body>
+</html>
