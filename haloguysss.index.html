@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sund_blue | Kai</title>
+    <style>
+        /* Reset & Base Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: #050505; /* Tema sangat gelap */
+            color: #f4f4f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Container Utama - Lebar penuh untuk support Horizontal/Desktop */
+        .container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            background: radial-gradient(circle at center, #1a1a1f 0%, #050505 100%);
+            overflow: hidden;
+        }
+
+        /* Sistem Pemindah Layar */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            z-index: 10;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+
+        /* --- LAYAR 1: SAMBUTAN AWAL --- */
+        .welcome-card {
+            text-align: center;
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px 30px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .welcome-card p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #d4d4d8;
+        }
+
+        .btn-next {
+            background: #ffffff;
+            color: #050505;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-next:hover {
+            background: #a1a1aa;
+            transform: translateY(-2px);
+        }
+
+        /* --- LAYAR 2: UTAMA (HORIZONTAL & RESPONSIVE) --- */
+        .main-content {
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Profil di kanan */
+            padding: 20px 40px;
+        }
+
+        /* Kotak Teks Perkenalan */
+        .profile-box {
+            width: 100%;
+            max-width: 450px;
+            z-index: 20;
+            background: rgba(10, 10, 12, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px;
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            animation: slideIn 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .profile-box h1 {
+            font-size: 24px;
+            color: #ffffff;
+            margin-bottom: 4px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-box .username {
+            font-size: 14px;
+            color: #71717a;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .profile-box p {
+            font-size: 14px;
+            color: #a1a1aa;
+            line-height: 1.6;
+        }
+
+        /* Quote Baru Sesuai Permintaan */
+        .quote-box {
+            margin-top: 20px;
+            padding-left: 15px;
+            border-left: 2px solid #52525b;
+            font-style: italic;
+            color: #d4d4d8;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* Bagian Hobi */
+        .hobbies-section {
+            margin-top: 25px;
+        }
+
+        .hobbies-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #52525b;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .hobbies-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .hobby-tag {
+            background: transparent;
+            border: 1px solid #3f3f46;
+            color: #a1a1aa;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .hobby-tag:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: #71717a;
+        }
+
+        /* --- LINGKUNGAN: POHON & TANAH (TEMA GELAP REALISTIS) --- */
+        .environment {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Tanah bertekstur noise realistis (Hitam Putih) */
+        .ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 12vh;
+            background-color: #0a0a0a;
+            /* SVG filter untuk efek tanah/rumput kasar hitam putih */
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.25"/></svg>');
+            border-top: 1px solid #1a1a1a;
+            box-shadow: inset 0 20px 50px rgba(0,0,0,0.9);
+        }
+
+        /* Pohon SVG di Samping Kiri */
+        .tree-container {
+            position: absolute;
+            bottom: 10vh; /* Nempel dengan tanah */
+            left: 5%;
+            width: 45vh; /* Ukuran dinamis berdasarkan tinggi layar */
+            height: 75vh;
+            max-width: 500px;
+        }
+
+        /* --- DAUN (HITAM/ABU GELAP) --- */
+        .leaf-static {
+            position: absolute;
+            width: 6px;
+            height: 9px;
+            background: #27272a;
+            border-radius: 50% 0 50% 0;
+            opacity: 0; /* Awalnya transparan */
+            transform: scale(0);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .leaf-static.grown {
+            opacity: 0.8;
+            transform: scale(1);
+        }
+
+        .leaf-falling {
+            position: absolute;
+            width: 6px;
+            height: 9px;
+            background: #18181b;
+            border-radius: 50% 0 50% 0;
+            z-index: 15;
+            pointer-events: none;
+            animation: fallToGround linear forwards;
+        }
+
+        @keyframes fallToGround {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(var(--travel-y)) translateX(var(--travel-x)) rotate(var(--rotate-deg));
+                opacity: 0;
+            }
+        }
+
+        /* Tombol Musik */
+        .music-btn {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .music-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive untuk HP Portrait */
+        @media (max-width: 768px) {
+            .main-content {
+                justify-content: center;
+                align-items: flex-end;
+                padding-bottom: 15vh;
+            }
+            .profile-box {
+                margin-top: 40vh; /* Memberi ruang untuk pohon di atas/belakang */
+                background: rgba(10, 10, 12, 0.85); /* Dibuat lebih solid di HP */
+            }
+            .tree-container {
+                left: 50%;
+                transform: translateX(-50%);
+                opacity: 0.6; /* Sedikit pudar di HP agar teks tetap terbaca */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Pastikan file lagu.flower.mp3 ada di folder yang sama -->
+        <audio id="bg-music" src="lagu.flower.mp3" loop></audio>
+
+        <div id="screen-welcome" class="screen">
+            <div class="welcome-card">
+                <p>Halo, makasih udah mau nengok linknya 😊</p>
+                <button class="btn-next" onclick="startExperience()">Masuk</button>
+            </div>
+        </div>
+
+        <div id="screen-main" class="screen hidden">
+            
+            <button class="music-btn" id="mute-btn" onclick="toggleMusic()">🎵</button>
+
+            <div class="main-content">
+                
+                <div class="profile-box">
+                    <h1>Hai, aku Kai</h1>
+                    <span class="username">@sund_blue</span>
+                    <p>Halo aku sund_blue, biasa dipanggil Kai. Selamat datang di halaman bio-ku!</p>
+                    
+                    <div class="hobbies-section">
+                        <div class="hobbies-title">Hobbies</div>
+                        <div class="hobbies-grid">
+                            <span class="hobby-tag">⚽ Futsal</span>
+                            <span class="hobby-tag">🏸 Badminton</span>
+                            <span class="hobby-tag">🏊 Swimming</span>
+                            <span class="hobby-tag">💻 Coding</span>
+                            <span class="hobby-tag">✍️ Writing Poetry</span>
+                        </div>
+                    </div>
+
+                    <!-- Quote Ditambahkan di Sini -->
+                    <div class="quote-box">
+                        always want to be better.<br>
+                        "The stars and the moon always know how to cheer up"
+                    </div>
+                </div>
+
+                <div class="environment">
+                    <div class="tree-container" id="tree">
+                        <!-- Pohon Siluet Realistis (SVG) -->
+                        <svg viewBox="0 0 512 512" style="width: 100%; height: 100%;" preserveAspectRatio="xMidYMax meet">
+                            <!-- Batang Utama & Akar -->
+                            <path d="M260,512 C255,400 240,300 245,200 C250,250 255,300 270,350 C265,400 275,480 290,512 Z" fill="#0f0f11"/>
+                            <path d="M260,512 C230,490 200,500 180,512 Z" fill="#0f0f11"/>
+                            <path d="M290,512 C320,490 330,500 350,512 Z" fill="#0f0f11"/>
+                            <!-- Dahan Kiri -->
+                            <path d="M245,300 C220,270 150,250 100,220" stroke="#0f0f11" stroke-width="12" fill="none" stroke-linecap="round"/>
+                            <path d="M160,260 C120,230 80,240 40,210" stroke="#0f0f11" stroke-width="6" fill="none" stroke-linecap="round"/>
+                            <path d="M245,230 C200,190 140,160 90,130" stroke="#0f0f11" stroke-width="10" fill="none" stroke-linecap="round"/>
+                            <path d="M150,170 C120,130 90,110 50,80" stroke="#0f0f11" stroke-width="5" fill="none" stroke-linecap="round"/>
+                            <!-- Dahan Kanan -->
+                            <path d="M255,280 C290,240 350,220 400,190" stroke="#0f0f11" stroke-width="12" fill="none" stroke-linecap="round"/>
+                            <path d="M330,235 C380,210 430,220 470,180" stroke="#0f0f11" stroke-width="6" fill="none" stroke-linecap="round"/>
+                            <path d="M250,190 C300,140 370,120 420,90" stroke="#0f0f11" stroke-width="9" fill="none" stroke-linecap="round"/>
+                            <path d="M340,130 C380,100 420,70 460,40" stroke="#0f0f11" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            <!-- Dahan Atas -->
+                            <path d="M245,200 C230,130 250,80 260,30" stroke="#0f0f11" stroke-width="10" fill="none" stroke-linecap="round"/>
+                            <path d="M255,100 C210,60 180,40 140,10" stroke="#0f0f11" stroke-width="5" fill="none" stroke-linecap="round"/>
+                            <path d="M255,120 C290,80 330,50 370,20" stroke="#0f0f11" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <div class="ground"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const bgMusic = document.getElementById('bg-music');
+        let musicPlaying = false;
+        
+        // Pengaturan Daun
+        const treeContainer = document.getElementById('tree');
+        const totalLeaves = 120; // Jumlah daun rimbun
+        const leavesData = [];
+
+        function startExperience() {
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-main').classList.remove('hidden');
+            
+            bgMusic.play().then(() => {
+                musicPlaying = true;
+                document.getElementById('mute-btn').innerText = '🎵';
+            }).catch(err => {
+                console.log("Autoplay diblokir browser.");
+            });
+
+            // Mulai Fase 1: Daun Muncul Satu per Satu
+            growLeaves();
+        }
+
+        function toggleMusic() {
+            if (musicPlaying) {
+                bgMusic.pause();
+                document.getElementById('mute-btn').innerText = '🔇';
+                musicPlaying = false;
+            } else {
+                bgMusic.play();
+                document.getElementById('mute-btn').innerText = '🎵';
+                musicPlaying = true;
+            }
+        }
+
+        // FASE 1: Menumbuhkan Daun di area mahkota pohon
+        function growLeaves() {
+            let count = 0;
+            
+            // Area persebaran daun (bentuk elips menutupi dahan SVG)
+            const centerX = 50; // 50% width
+            const centerY = 35; // 35% height (agak ke atas)
+            const radiusX = 40; 
+            const radiusY = 30;
+
+            const growInterval = setInterval(() => {
+                if (count >= totalLeaves) {
+                    clearInterval(growInterval);
+                    // Setelah semua tumbuh, mulai Fase 2: Gugur
+                    setTimeout(startFallingLeaves, 500); 
+                    return;
+                }
+
+                // Hitung posisi acak di dalam elips
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.sqrt(Math.random());
+                const x = centerX + (radius * Math.cos(angle) * radiusX);
+                const y = centerY + (radius * Math.sin(angle) * radiusY);
+
+                const leaf = document.createElement('div');
+                leaf.classList.add('leaf-static');
+                
+                // Variasi warna gelap
+                const colors = ['#18181b', '#27272a', '#3f3f46', '#09090b'];
+                leaf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                leaf.style.left = x + '%';
+                leaf.style.top = y + '%';
+                
+                // Simpan rotasi acak
+                const rot = Math.random() * 360;
+                leaf.style.transform = `scale(0) rotate(${rot}deg)`;
+                
+                treeContainer.appendChild(leaf);
+                leavesData.push({ element: leaf, x: x, y: y, color: leaf.style.backgroundColor });
+
+                // Picu animasi tumbuh (scale ke 1)
+                setTimeout(() => {
+                    leaf.classList.add('grown');
+                    leaf.style.transform = `scale(${Math.random() * 0.5 + 0.8}) rotate(${rot}deg)`;
+                }, 50);
+
+                count++;
+            }, 30); // Kecepatan tumbuh (30ms per daun)
+        }
+
+        // FASE 2: Daun berguguran terus-menerus
+        function startFallingLeaves() {
+            setInterval(() => {
+                // Pilih posisi daun secara acak dari daun yang sudah tumbuh
+                const randomLeafData = leavesData[Math.floor(Math.random() * leavesData.length)];
+                
+                const fallingLeaf = document.createElement('div');
+                fallingLeaf.classList.add('leaf-falling');
+                fallingLeaf.style.backgroundColor = randomLeafData.color;
+                
+                // Sesuaikan ukuran daun jatuh dengan daun di pohon
+                const size = Math.random() * 4 + 5;
+                fallingLeaf.style.width = size + 'px';
+                fallingLeaf.style.height = (size * 1.5) + 'px';
+
+                // Mulai jatuh dari posisi asal di pohon
+                fallingLeaf.style.left = randomLeafData.x + '%';
+                fallingLeaf.style.top = randomLeafData.y + '%';
+
+                // Hitung jarak dan arah jatuh
+                const travelY = Math.random() * 60 + 60; // Jatuh ke bawah (vh)
+                const travelX = (Math.random() - 0.5) * 40; // Tertiup angin ke kiri/kanan (vw)
+                const rotateDeg = Math.random() * 360 + 180; 
+                const duration = Math.random() * 3 + 3; // Kecepatan jatuh 3-6 detik
+
+                fallingLeaf.style.setProperty('--travel-y', `${travelY}vh`);
+                fallingLeaf.style.setProperty('--travel-x', `${travelX}vw`);
+                fallingLeaf.style.setProperty('--rotate-deg', `${rotateDeg}deg`);
+                fallingLeaf.style.animationDuration = duration + 's';
+
+                treeContainer.appendChild(fallingLeaf);
+
+                // Hapus daun setelah menyentuh tanah agar web tidak lag
+                setTimeout(() => {
+                    fallingLeaf.remove();
+                }, duration * 1000);
+
+            }, 250); // Kecepatan muncul daun gugur baru (250ms)
+        }
+    </script>
+</body>
+</html>
